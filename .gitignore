@@ -1,0 +1,11 @@
+build/
+temp/
+GeneratedFiles/
+.vs/
+*.log
+*.exe
+*.pdb
+*.ilk
+*.obj
+*.tlog
+*.db

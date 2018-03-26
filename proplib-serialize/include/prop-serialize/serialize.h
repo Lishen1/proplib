@@ -1,0 +1,58 @@
+#pragma once
+
+#include "serializable.h"
+#include "serializers/yaml_serialize.h"
+#include "tools.h"
+#include <functional>
+#include <map>
+
+namespace proplib
+{
+  template <class T>
+  Container<T>* try_cast(IContainer* icont)
+  {
+    return dynamic_cast<Container<clear_type<T>::type>*>(icont);
+  }
+
+  template <class Ser, class T>
+  res_t try_serialize(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
+  {
+    auto container = try_cast<Ser>(cont);
+    if (container)
+      return proplib::serdes::serialize_field(key, &field, logger_id, container->node());
+    else
+      return res_t::error;
+  }
+
+  template <class Deser, class T>
+  res_t try_deserialize(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
+  {
+    auto container = try_cast<Deser>(cont);
+    if (container)
+      return proplib::serdes::deserialize_field(key, &field, logger_id, container->node());
+    else
+      return res_t::error;
+  }
+
+  template <class T>
+  res_t try_serialize_all(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
+  {
+    return try_serialize<YAML::Emitter>(key, cont, logger_id, field);
+  }
+
+  template <class T>
+  res_t try_deserialize_all(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
+  {
+    return try_deserialize<YAML::Node>(key, cont, logger_id, field);
+  }
+
+#define UNNAMED_IMPL(x, y) UNNAMED_##x##_##y
+#define UNNAMED_DECL(x, y) UNNAMED_IMPL(x, y)
+#define UNNAMED UNNAMED_DECL(__LINE__, __COUNTER__)
+
+#define SERIALIZE(x)                                                                                                                   \
+  char UNNAMED                                                                                                                         \
+      = add_serdes_lambda(#x, [this](const std::string& key, proplib::IContainer* cont) { return try_serialize_all(key, cont, _logger_id, x); }, \
+                                                                                                                                       \
+                          [this](const std::string& key, proplib::IContainer* cont) mutable { return try_deserialize_all(key, cont, _logger_id, x); })
+} // namespace proplib
