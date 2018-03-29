@@ -50,9 +50,20 @@ namespace proplib
 #define UNNAMED_DECL(x, y) UNNAMED_IMPL(x, y)
 #define UNNAMED UNNAMED_DECL(__LINE__, __COUNTER__)
 
-#define SERIALIZE(x)                                                                                                                   \
-  char UNNAMED                                                                                                                         \
-      = add_serdes_lambda(#x, [this](const std::string& key, proplib::IContainer* cont) { return try_serialize_all(key, cont, _logger_id, x); }, \
-                                                                                                                                       \
-                          [this](const std::string& key, proplib::IContainer* cont) mutable { return try_deserialize_all(key, cont, _logger_id, x); })
+#define SERIALIZE(x)                                                                                                         \
+  char UNNAMED = add_serdes_lambda(                                                                                          \
+      #x, [this](const std::string& key, proplib::IContainer* cont) { return try_serialize_all(key, cont, _logger_id, x); }, \
+                                                                                                                             \
+      [this](const std::string& key, proplib::IContainer* cont) mutable { return try_deserialize_all(key, cont, _logger_id, x); })
+
+#define SERIALIZE_SUBS()                                                                                                                             \
+  char UNNAMED = serialize_subs([this]() {                                                                                                           \
+    for (auto ch : subprops)                                                                                                                         \
+    {                                                                                                                                                \
+      add_serdes_lambda(                                                                                                                             \
+          ch.first, [this, ch](const std::string& key, proplib::IContainer* cont) { return try_serialize_all(key, cont, _logger_id, *ch.second); },  \
+          [this, ch](const std::string& key, proplib::IContainer* cont) mutable { return try_deserialize_all(key, cont, _logger_id, *ch.second); }); \
+    }                                                                                                                                                \
+  })
+
 } // namespace proplib

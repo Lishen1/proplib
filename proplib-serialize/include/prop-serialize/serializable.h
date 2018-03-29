@@ -41,6 +41,7 @@ namespace proplib
   {
     protected:
     typedef std::function<res_t(const std::string&, IContainer*)> Func;
+    typedef std::function<void()> NRFunc;
 
     struct Serializer_pair
     {
@@ -61,13 +62,23 @@ namespace proplib
       return 0;
     }
 
-    std::string _logger_id;
+    char serialize_subs(NRFunc func)
+    {
+      _subs_deser_func = func;
+      return 0;
+    }
+
+   
 
     public:
+      bool add_subprop(Serializable* p, const std::string& name) { subprops[name] = p; return true; }
     void set_logger(const std::string& logger_id) { _logger_id = logger_id; }
     template <class T>
     res_t serialize(T& cont) const
     {
+      if (_subs_deser_func)
+        _subs_deser_func();
+
       Container<clear_type<T>::type> container(cont);
       for (auto& lv_ser : _serializers)
         if (lv_ser.second.serializer(lv_ser.first, &container) != res_t::ok)
@@ -87,8 +98,11 @@ namespace proplib
     template <class T>
     res_t deserialize(T& cont) const
     {
-      Container<T> container(cont);
 
+      if (_subs_deser_func)
+        _subs_deser_func();
+
+      Container<T> container(cont);
       stat_t stat;
 
       for (auto& lv_ser : _serializers)
@@ -114,7 +128,13 @@ namespace proplib
       return res_t::ok;
     }
 
+    protected:
+    std::string _logger_id;
+    std::map<std::string, Serializable*> subprops;
+    NRFunc _subs_deser_func = nullptr;
+
     private:
     std::map<std::string, Serializer_pair> _serializers;
+
   };
 } // namespace proplib

@@ -44,7 +44,7 @@ public:
   TestClass_1() {}
   void set_random()
   {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 3; i++)
     {
       vector_int.push_back(rand());
       vector_float.push_back((float)rand() / RAND_MAX);
@@ -134,7 +134,7 @@ public:
 
   void set_random()
   {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 2; i++)
     {
       vector_test_class_1.push_back(new TestClass_1());
       vector_test_class_1.back()->set_random();
@@ -143,6 +143,7 @@ public:
     }
 
     bool_field = rand()%2;
+
   }
 
   bool operator==(const TestClass_2& other)
@@ -168,6 +169,8 @@ private:
   SERIALIZE(vector_test_class_1);
   SERIALIZE(test_class_1_field);
   SERIALIZE(bool_field);
+  SERIALIZE_SUBS();
+  //SERIALIZE(subprops);
 };
 
 void main()
@@ -192,6 +195,18 @@ void main()
 
   std::string name2 = name;
 
+  auto c1 = new TestClass_1;
+  auto c2 = new TestClass_1;
+  auto c3 = new TestClass_1;
+
+  c1->set_random();
+  c2->set_random();
+  c3->set_random();
+
+  ser_test.add_subprop(c1, "c1");
+  ser_test.add_subprop(c2, "c2");
+  ser_test.add_subprop(c3, "c3");
+
   ser_test.set_logger(name);
   ser_test.serialize(out);
 
@@ -209,7 +224,15 @@ void main()
 
   deser_test.reset();
 
-  std::cout << "-----------------------" << std::endl;
+  c1->set_random();
+  c2->set_random();
+  c3->set_random();
+
+  deser_test.add_subprop(c1, "c1");
+  deser_test.add_subprop(c2, "c2");
+  deser_test.add_subprop(c3, "c3");
+
+  std::cout << "==================================" << std::endl;
   std::cout << saved_yml << std::endl;
 
   deser_test.set_logger(name2);

@@ -17,6 +17,7 @@
 
 namespace proplib
 {
+
   namespace serdes
   {
     template <class T>
