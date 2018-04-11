@@ -129,4 +129,14 @@ namespace proplib
     static constexpr bool const value = is_stl_container_impl::is_stl_container<std::decay_t<T>>::value;
   };
 
+  std::string get_doc_string()
+  {
+    return "";
+  }
+
+  std::string get_doc_string(const char* str)
+  {
+    return str;
+  }
+
 } // namespace proplib

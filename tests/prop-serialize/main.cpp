@@ -103,13 +103,13 @@ public:
   }
 
 private:
-  SERIALIZE(vector_int);
-  SERIALIZE(vector_float);
-  SERIALIZE(float_field);
-  SERIALIZE(int_field);
-  SERIALIZE(string_field);
-  SERIALIZE(map_int_string);
-  SERIALIZE(bool_field);
+  SERIALIZE(vector_int, "this is vector of integers");
+  SERIALIZE(vector_float, "this is vector of floats");
+  SERIALIZE(float_field, "just float");
+  SERIALIZE(int_field, "just int");
+  SERIALIZE(string_field, "it is string!");
+  SERIALIZE(map_int_string, "map int <-> string");
+  SERIALIZE(bool_field, "just bool");
 };
 
 class TestClass_2 : public proplib::Serializable
@@ -166,11 +166,10 @@ public:
   }
 
 private:
-  SERIALIZE(vector_test_class_1);
-  SERIALIZE(test_class_1_field);
-  SERIALIZE(bool_field);
-  SERIALIZE_SUBS();
-  //SERIALIZE(subprops);
+  SERIALIZE(vector_test_class_1, "vector contained instances of class_1");
+  SERIALIZE(test_class_1_field, "just field of class_1");
+  SERIALIZE(bool_field, "bool type, true or false");
+  //SERIALIZE_SUBS();
 };
 
 void main()
@@ -208,7 +207,7 @@ void main()
   ser_test.add_subprop(c3, "c3");
 
   ser_test.set_logger(name);
-  ser_test.serialize(out);
+  ser_test.serialize(out, true);
 
   out << YAML::EndMap;
   std::cout << "yaml\n" << out.c_str() << std::endl;

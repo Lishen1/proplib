@@ -35,12 +35,23 @@ namespace proplib
     }
 
     template <class T>
-    res_t serialize_field_other(const std::string& key, T* val, const std::string& logger_id, YAML::Emitter& node, ...)
+    res_t serialize_field_other(const std::string& key, T* val, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
+                                YAML::Emitter& node, ...)
     {
       node.SetSeqFormat(YAML::Flow);
       const std::string name = type_name<T>();
-      node << YAML::Key << key << YAML::VerbatimTag(name);
+      node << YAML::Key << key;
+
+      if (scheme)
+        node << YAML::VerbatimTag(name);
+
       node << YAML::Value << *val;
+
+      if (scheme && doc_string.size())
+      {
+        node << YAML::Key << (key+"_doc") << YAML::VerbatimTag("doc");
+        node << YAML::Value << doc_string;
+      }
 
       if (!node.good())
       {
@@ -56,12 +67,17 @@ namespace proplib
     }
 
     template <class T>
-    res_t serialize_field_other(const std::string& key, T* val, const std::string& logger_id, YAML::Emitter& node, Serializable*)
+    res_t serialize_field_other(const std::string& key, T* val, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
+                                YAML::Emitter& node, Serializable*)
     {
-      node << YAML::Key << key << YAML::VerbatimTag("serializable");
+      node << YAML::Key << key;
+      if (scheme)
+      {
+        node << YAML::VerbatimTag("serializable");
+      }
       node << YAML::Value << YAML::BeginMap;
       val->set_logger(logger_id);
-      if (val->serialize(node) != res_t::ok)
+      if (val->serialize(node, scheme) != res_t::ok)
       {
 #if ENABLE_SERDES_LOGGING
         CLOG(ERROR, logger_id.c_str()) << "failed to serialize key "
@@ -70,6 +86,12 @@ namespace proplib
         return res_t::error;
       }
       node << YAML::EndMap;
+
+      if (scheme && doc_string.size())
+      {
+        node << YAML::Key << (key+"_doc") << YAML::VerbatimTag("doc");
+        node << YAML::Value << doc_string;
+      }
 
       if (!node.good())
       {
@@ -87,15 +109,21 @@ namespace proplib
 
     template <class T>
     typename std::enable_if<std::is_base_of<Serializable, typename clear_type<T>::type>::value, res_t>::type
-    serialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, YAML::Emitter& node)
+    serialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, const std::string& doc_string,
+                                        const bool& scheme, YAML::Emitter& node)
     {
-      node << YAML::Key << key << YAML::VerbatimTag("vector:serializable");
+      node << YAML::Key << key;
+      if (scheme)
+      {
+        node << YAML::VerbatimTag("vector:serializable");
+      }
+      
       node << YAML::Value << YAML::Block << YAML::BeginSeq;
       for (auto& el : *val)
       {
         node << YAML::Value << YAML::BeginMap;
         el->set_logger(logger_id);
-        if (el->serialize(node) != res_t::ok)
+        if (el->serialize(node, scheme) != res_t::ok)
         {
 #if ENABLE_SERDES_LOGGING
           CLOG(ERROR, logger_id.c_str()) << "failed to serialize key "
@@ -106,6 +134,13 @@ namespace proplib
         node << YAML::EndMap;
       }
       node << YAML::EndSeq;
+
+      if (scheme && doc_string.size())
+      {
+        node << YAML::Key << (key+"_doc") << YAML::VerbatimTag("doc");
+        node << YAML::Value << doc_string;
+      }
+
       if (!node.good())
       {
 #if ENABLE_SERDES_LOGGING
@@ -120,30 +155,37 @@ namespace proplib
 
     template <class T>
     typename std::enable_if<(!std::is_base_of<Serializable, typename clear_type<T>::type>::value), res_t>::type
-    serialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, YAML::Emitter& node)
+    serialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, const std::string& doc_string,
+                                        const bool& scheme, YAML::Emitter& node)
     {
-      return serialize_field_other(key, val, logger_id, node);
+      return serialize_field_other(key, val, logger_id, doc_string, scheme, node);
     }
 
     template <class K, class T>
     typename std::enable_if<(!std::is_base_of<Serializable, typename clear_type<T>::type>::value), res_t>::type
-    serialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, YAML::Emitter& node)
+    serialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, const std::string& doc_string,
+                                     const bool& scheme, YAML::Emitter& node)
     {
-      return serialize_field_other(key, val, logger_id, node);
+      return serialize_field_other(key, val, logger_id, doc_string, scheme, node);
     }
 
     template <class K, class T>
     typename std::enable_if<(std::is_base_of<Serializable, typename clear_type<T>::type>::value), res_t>::type
-    serialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, YAML::Emitter& node)
+    serialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, const std::string& doc_string,
+                                     const bool& scheme, YAML::Emitter& node)
     {
-      node << YAML::Key << key << YAML::VerbatimTag(std::string("map:") + type_name<K>() + std::string(":serializable"));
+      node << YAML::Key << key;
+      if (scheme)
+      {
+        node << YAML::VerbatimTag(std::string("map:") + type_name<K>() + std::string(":serializable"));
+      }
       node << YAML::Value << YAML::BeginMap;
       for (auto& el : *val)
       {
         node << YAML::Key << el.first;
         node << YAML::Value << YAML::BeginMap;
         el.second->set_logger(logger_id);
-        if (el.second->serialize(node) != res_t::ok)
+        if (el.second->serialize(node, scheme) != res_t::ok)
         {
 #if ENABLE_SERDES_LOGGING
           CLOG(ERROR, logger_id.c_str()) << "failed to serialize key "
@@ -154,6 +196,12 @@ namespace proplib
         node << YAML::EndMap;
       }
       node << YAML::EndMap;
+
+      if (scheme && doc_string.size())
+      {
+        node << YAML::Key << (key+"_doc") << YAML::VerbatimTag("doc");
+        node << YAML::Value << doc_string;
+      }
 
       if (!node.good())
       {
@@ -170,23 +218,24 @@ namespace proplib
 
     template <class T>
     typename std::enable_if<is_vector<T>::value, res_t>::type serialize_field(const std::string& key, T* val, const std::string& logger_id,
-                                                                              YAML::Emitter& node)
+                                                                              const std::string& doc_string, const bool& scheme, YAML::Emitter& node)
     {
-      return serialize_field_vector_serializable(key, val, logger_id, node);
+      return serialize_field_vector_serializable(key, val, logger_id, doc_string, scheme, node);
     }
 
     template <class T>
     typename std::enable_if<is_map<T>::value, res_t>::type serialize_field(const std::string& key, T* val, const std::string& logger_id,
-                                                                           YAML::Emitter& node)
+                                                                           std::string doc_string, const bool& scheme, YAML::Emitter& node)
     {
-      return serialize_field_map_serializable(key, val, logger_id, node);
+      return serialize_field_map_serializable(key, val, logger_id, doc_string, scheme, node);
     }
 
     template <class T>
     typename std::enable_if<(!is_stl_container<T>::value), res_t>::type serialize_field(const std::string& key, T* val, const std::string& logger_id,
+                                                                                        const std::string& doc_string, const bool& scheme,
                                                                                         YAML::Emitter& node)
     {
-      return serialize_field_other(key, val, logger_id, node, (clear_type<decltype(val)>::type*)nullptr);
+      return serialize_field_other(key, val, logger_id, doc_string, scheme, node, (clear_type<decltype(val)>::type*)nullptr);
     }
 
     //! =============================deserialization===============================

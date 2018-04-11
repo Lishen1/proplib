@@ -15,11 +15,12 @@ namespace proplib
   }
 
   template <class Ser, class T>
-  res_t try_serialize(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
+  res_t try_serialize(const std::string& key, IContainer* cont, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
+                      T& field)
   {
     auto container = try_cast<Ser>(cont);
     if (container)
-      return proplib::serdes::serialize_field(key, &field, logger_id, container->node());
+      return proplib::serdes::serialize_field(key, &field, logger_id, doc_string, scheme, container->node());
     else
       return res_t::error;
   }
@@ -35,9 +36,10 @@ namespace proplib
   }
 
   template <class T>
-  res_t try_serialize_all(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
+  res_t try_serialize_all(const std::string& key, IContainer* cont, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
+                          T& field)
   {
-    return try_serialize<YAML::Emitter>(key, cont, logger_id, field);
+    return try_serialize<YAML::Emitter>(key, cont, logger_id, doc_string, scheme, field);
   }
 
   template <class T>
@@ -50,10 +52,13 @@ namespace proplib
 #define UNNAMED_DECL(x, y) UNNAMED_IMPL(x, y)
 #define UNNAMED UNNAMED_DECL(__LINE__, __COUNTER__)
 
-#define SERIALIZE(x)                                                                                                         \
-  char UNNAMED = add_serdes_lambda(                                                                                          \
-      #x, [this](const std::string& key, proplib::IContainer* cont) { return try_serialize_all(key, cont, _logger_id, x); }, \
-                                                                                                                             \
+#define SERIALIZE(x, ...)                                                                                  \
+  char UNNAMED = add_serdes_lambda(                                                                        \
+      #x,                                                                                                  \
+      [this](const std::string& key, proplib::IContainer* cont) {                                          \
+        return try_serialize_all(key, cont, _logger_id, proplib::get_doc_string(__VA_ARGS__), _scheme, x); \
+      },                                                                                                   \
+                                                                                                           \
       [this](const std::string& key, proplib::IContainer* cont) mutable { return try_deserialize_all(key, cont, _logger_id, x); })
 
 #define SERIALIZE_SUBS()                                                                                                                             \
