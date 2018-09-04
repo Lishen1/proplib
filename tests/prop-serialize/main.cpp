@@ -169,7 +169,7 @@ private:
   SERIALIZE(vector_test_class_1, "vector contained instances of class_1");
   SERIALIZE(test_class_1_field, "just field of class_1");
   SERIALIZE(bool_field, "bool type, true or false");
-  //SERIALIZE_SUBS();
+  SERIALIZE_SUBS();
 };
 
 void main()
