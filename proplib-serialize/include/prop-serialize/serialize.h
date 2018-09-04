@@ -66,7 +66,10 @@ namespace proplib
     for (auto ch : subprops)                                                                                                                         \
     {                                                                                                                                                \
       add_serdes_lambda(                                                                                                                             \
-          ch.first, [this, ch](const std::string& key, proplib::IContainer* cont) { return try_serialize_all(key, cont, _logger_id, *ch.second); },  \
+          ch.first,                                                                                                                                  \
+          [this, ch](const std::string& key, proplib::IContainer* cont) {                                                                            \
+            return try_serialize_all(key, cont, _logger_id, proplib::get_doc_string(), _scheme, *ch.second);                                         \
+          },                                                                                                                                         \
           [this, ch](const std::string& key, proplib::IContainer* cont) mutable { return try_deserialize_all(key, cont, _logger_id, *ch.second); }); \
     }                                                                                                                                                \
   })
