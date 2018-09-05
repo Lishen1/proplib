@@ -53,7 +53,7 @@ namespace proplib
   {
   };
 
-  std::string std_vector_typename(...) { return std::string("is_not_vector_type"); }
+  inline std::string std_vector_typename(...) { return std::string("is_not_vector_type"); }
 
   template <class T>
   constexpr std::string std_vector_typename(std::vector<T> v)
@@ -66,7 +66,7 @@ namespace proplib
     return val;
   }
 
-  std::string std_map_typename(...) { return std::string("is_not_map_type"); }
+  inline std::string std_map_typename(...) { return std::string("is_not_map_type"); }
 
   template <class T, class V>
   constexpr std::string std_map_typename(std::map<T, V> v)
@@ -150,12 +150,12 @@ namespace proplib
     static constexpr bool const value = is_stl_container_impl::is_stl_container<std::decay_t<T>>::value;
   };
 
-  std::string get_doc_string()
+  inline std::string get_doc_string()
   {
     return "";
   }
 
-  std::string get_doc_string(const char* str)
+  inline std::string get_doc_string(const char* str)
   {
     return str;
   }
