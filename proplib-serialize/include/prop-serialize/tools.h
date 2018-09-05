@@ -92,7 +92,28 @@ namespace proplib
     std::string name = "unknown";
 
     if (std::is_arithmetic<T>::value)
-      name = typeid(T).name();
+    {
+      if (std::is_same<T, uint64_t>::value)
+        name = "uint64_t";
+      else if (std::is_same<T, uint32_t>::value)
+        name = "uint32_t";
+      else if (std::is_same<T, uint16_t>::value)
+        name = "uint16_t";
+      else if (std::is_same<T, uint8_t>::value)
+        name = "uint8_t";
+      else if (std::is_same<T, int64_t>::value)
+        name = "int64_t";
+      else if (std::is_same<T, int32_t>::value)
+        name = "int32_t";
+      else if (std::is_same<T, int16_t>::value)
+        name = "int16_t";
+      else if (std::is_same<T, int8_t>::value)
+        name = "int8_t";
+      else if (std::is_same<T, double>::value)
+        name = "double";
+      else if (std::is_same<T, float>::value)
+        name = "float";
+    }
     else if (std::is_same<T, std::string>::value)
       name = "string";
     else if (is_vector<T>::value)
