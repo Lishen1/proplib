@@ -21,19 +21,47 @@ namespace proplib
   struct clear_type
   {
     typedef T type;
+    typedef const T const_type;
   };
 
   template <class T>
   struct clear_type<T*>
   {
     typedef T type;
+    typedef const T const_type;
   };
 
   template <class T>
   struct clear_type<T&>
   {
     typedef T type;
+    typedef const T const_type;
   };
+
+  //-------------------
+
+  template <class T>
+  struct clear_type<const T*>
+  {
+    typedef T type;
+    typedef const T const_type;
+  };
+
+  template <class T>
+  struct clear_type<const T&>
+  {
+    typedef T type;
+    typedef const T const_type;
+  };
+
+  template <class T>
+  struct clear_type<const T>
+  {
+    typedef T type;
+    typedef const T const_type;
+  };
+
+  //-------------------
 
   template <typename T>
   struct is_vector : public std::false_type
