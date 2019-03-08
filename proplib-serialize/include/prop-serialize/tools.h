@@ -21,19 +21,47 @@ namespace proplib
   struct clear_type
   {
     typedef T type;
+    typedef const T const_type;
   };
 
   template <class T>
   struct clear_type<T*>
   {
     typedef T type;
+    typedef const T const_type;
   };
 
   template <class T>
   struct clear_type<T&>
   {
     typedef T type;
+    typedef const T const_type;
   };
+
+  //-------------------
+
+  template <class T>
+  struct clear_type<const T*>
+  {
+    typedef T type;
+    typedef const T const_type;
+  };
+
+  template <class T>
+  struct clear_type<const T&>
+  {
+    typedef T type;
+    typedef const T const_type;
+  };
+
+  template <class T>
+  struct clear_type<const T>
+  {
+    typedef T type;
+    typedef const T const_type;
+  };
+
+  //-------------------
 
   template <typename T>
   struct is_vector : public std::false_type
@@ -53,7 +81,7 @@ namespace proplib
   {
   };
 
-  std::string std_vector_typename(...) { return std::string("is_not_vector_type"); }
+  inline std::string std_vector_typename(...) { return std::string("is_not_vector_type"); }
 
   template <class T>
   constexpr std::string std_vector_typename(std::vector<T> v)
@@ -66,7 +94,7 @@ namespace proplib
     return val;
   }
 
-  std::string std_map_typename(...) { return std::string("is_not_map_type"); }
+  inline std::string std_map_typename(...) { return std::string("is_not_map_type"); }
 
   template <class T, class V>
   constexpr std::string std_map_typename(std::map<T, V> v)
@@ -92,7 +120,28 @@ namespace proplib
     std::string name = "unknown";
 
     if (std::is_arithmetic<T>::value)
-      name = typeid(T).name();
+    {
+      if (std::is_same<T, uint64_t>::value)
+        name = "uint64_t";
+      else if (std::is_same<T, uint32_t>::value)
+        name = "uint32_t";
+      else if (std::is_same<T, uint16_t>::value)
+        name = "uint16_t";
+      else if (std::is_same<T, uint8_t>::value)
+        name = "uint8_t";
+      else if (std::is_same<T, int64_t>::value)
+        name = "int64_t";
+      else if (std::is_same<T, int32_t>::value)
+        name = "int32_t";
+      else if (std::is_same<T, int16_t>::value)
+        name = "int16_t";
+      else if (std::is_same<T, int8_t>::value)
+        name = "int8_t";
+      else if (std::is_same<T, double>::value)
+        name = "double";
+      else if (std::is_same<T, float>::value)
+        name = "float";
+    }
     else if (std::is_same<T, std::string>::value)
       name = "string";
     else if (is_vector<T>::value)
@@ -129,12 +178,12 @@ namespace proplib
     static constexpr bool const value = is_stl_container_impl::is_stl_container<std::decay_t<T>>::value;
   };
 
-  std::string get_doc_string()
+  inline std::string get_doc_string()
   {
     return "";
   }
 
-  std::string get_doc_string(const char* str)
+  inline std::string get_doc_string(const char* str)
   {
     return str;
   }

@@ -24,6 +24,7 @@
   <ItemGroup>
     <ClInclude Include="include\prop-serialize\3rd\Easyloggingpp\include\easylogging++.h" />
     <ClInclude Include="include\prop-serialize\config.h" />
+    <ClInclude Include="include\prop-serialize\proplib.h" />
     <ClInclude Include="include\prop-serialize\serializable.h" />
     <ClInclude Include="include\prop-serialize\serialize.h" />
     <ClInclude Include="include\prop-serialize\serializers\yaml_serialize.h" />

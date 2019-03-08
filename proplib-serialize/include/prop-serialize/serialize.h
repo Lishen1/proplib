@@ -14,9 +14,15 @@ namespace proplib
     return dynamic_cast<Container<clear_type<T>::type>*>(icont);
   }
 
+  template <class T>
+  Container<T>* try_const_cast(IContainer* icont)
+  {
+    return dynamic_cast<Container<clear_type<T>::const_type>*>(icont);
+  }
+
   template <class Ser, class T>
   res_t try_serialize(const std::string& key, IContainer* cont, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
-                      T& field)
+    T& field)
   {
     auto container = try_cast<Ser>(cont);
     if (container)
@@ -29,7 +35,11 @@ namespace proplib
   res_t try_deserialize(const std::string& key, IContainer* cont, const std::string& logger_id, T& field)
   {
     auto container = try_cast<Deser>(cont);
-    if (container)
+    auto const_container = try_const_cast<const Deser>(cont);
+
+    if (const_container)
+      return proplib::serdes::deserialize_field(key, &field, logger_id, const_container->node());
+    else if (container)
       return proplib::serdes::deserialize_field(key, &field, logger_id, container->node());
     else
       return res_t::error;
@@ -37,7 +47,7 @@ namespace proplib
 
   template <class T>
   res_t try_serialize_all(const std::string& key, IContainer* cont, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
-                          T& field)
+    T& field)
   {
     return try_serialize<YAML::Emitter>(key, cont, logger_id, doc_string, scheme, field);
   }

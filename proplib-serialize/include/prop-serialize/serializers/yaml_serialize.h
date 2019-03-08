@@ -101,7 +101,6 @@ namespace proplib
                                        << " reason: " << node.GetLastError();
 #endif
         return res_t::error;
-        ;
       }
 
       return res_t::ok;
@@ -242,28 +241,28 @@ namespace proplib
 
     template <class T>
     typename std::enable_if<is_vector<T>::value, res_t>::type deserialize_field(const std::string& key, T* val, const std::string& logger_id,
-                                                                                YAML::Node& node)
+                                                                                const YAML::Node& node)
     {
       return deserialize_field_vector_serializable(key, val, logger_id, node);
     }
 
     template <class T>
     typename std::enable_if<(!is_stl_container<T>::value), res_t>::type deserialize_field(const std::string& key, T* val,
-                                                                                          const std::string& logger_id, YAML::Node& node)
+                                                                                          const std::string& logger_id, const YAML::Node& node)
     {
       return deserialize_field_other(key, val, logger_id, node, (clear_type<decltype(val)>::type*)nullptr);
     }
 
     template <class T>
-    res_t deserialize_field_other(const std::string& key, T* val, const std::string& logger_id, YAML::Node& node, ...)
+    res_t deserialize_field_other(const std::string& key, T* val, const std::string& logger_id, const YAML::Node& node, ...)
     {
       if (!node[key])
       {
 #if ENABLE_SERDES_LOGGING
         CLOG(WARNING, logger_id.c_str()) << "no key "
                                          << "\"" << key << "\".";
-        return res_t::key_not_found;
 #endif
+        return res_t::key_not_found;
       }
       try
       {
@@ -282,7 +281,7 @@ namespace proplib
     }
 
     template <class T>
-    res_t deserialize_field_other(const std::string& key, T* val, const std::string& logger_id, YAML::Node& node, Serializable*)
+    res_t deserialize_field_other(const std::string& key, T* val, const std::string& logger_id, const YAML::Node& node, Serializable*)
     {
       if (!node[key])
       {
@@ -298,7 +297,7 @@ namespace proplib
 
     template <class T>
     typename std::enable_if<std::is_base_of<Serializable, typename clear_type<T>::type>::value, res_t>::type
-    deserialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, YAML::Node& node)
+    deserialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, const YAML::Node& node)
     {
       if (!node[key])
       {
@@ -361,28 +360,28 @@ namespace proplib
 
     template <class T>
     typename std::enable_if<(!std::is_base_of<Serializable, typename clear_type<T>::type>::value), res_t>::type
-    deserialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, YAML::Node& node)
+    deserialize_field_vector_serializable(const std::string& key, std::vector<T>* val, const std::string& logger_id, const YAML::Node& node)
     {
       return deserialize_field_other(key, val, logger_id, node);
     }
 
     template <class T>
     typename std::enable_if<is_map<T>::value, res_t>::type deserialize_field(const std::string& key, T* val, const std::string& logger_id,
-                                                                             YAML::Node& node)
+      const YAML::Node& node)
     {
       return deserialize_field_map_serializable(key, val, logger_id, node);
     }
 
     template <class K, class T>
     typename std::enable_if<(!std::is_base_of<Serializable, typename clear_type<T>::type>::value), res_t>::type
-    deserialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, YAML::Node& node)
+    deserialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, const YAML::Node& node)
     {
       return deserialize_field_other(key, val, logger_id, node);
     }
 
     template <class K, class T>
     typename std::enable_if<(std::is_base_of<Serializable, typename clear_type<T>::type>::value), res_t>::type
-    deserialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, YAML::Node& node)
+    deserialize_field_map_serializable(const std::string& key, std::map<K, T>* val, const std::string& logger_id, const YAML::Node& node)
     {
 
       if (!node[key])
