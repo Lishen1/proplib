@@ -6,7 +6,9 @@
 #include <strstream>
 #include "QAbstractScrollArea"
 #include "QScrollBar"
+#include <QDebug>
 #include "Yaml_highlighter.h"
+#include <QFile>
 
 proplibqteditor::proplibqteditor(QWidget *parent)
     : QMainWindow(parent)
@@ -39,13 +41,11 @@ proplibqteditor::proplibqteditor(QWidget *parent)
 
     ui.widget_2->layout()->addWidget(_yaml_viewer);
 
-    //startTimer(5000);
-
     QObject::connect(ui.actionOpen_Config, &QAction::triggered, this, &proplibqteditor::open_config_diag);
+    QObject::connect(ui.actionSave_Config, &QAction::triggered, this, &proplibqteditor::save_config_diag);
     QObject::connect(_yaml_viewer, &QTextEdit::cursorPositionChanged, this, &proplibqteditor::cursor_position_changed);
 
     open_config(R"(D:\User_data\VC_PROJECTS\proplib\tests\prop-serialize\test.yml)");
-
 }
 
 
@@ -55,11 +55,8 @@ void proplibqteditor::open_config(const QString& path)
   QElapsedTimer timer;
   timer.start();
   _prop_gui->build_gui(_current_config);
-  //_prop_gui->build_gui(yaml_config);
-
   _prop_gui->update_gui(_current_config);
-  std::cout << "build_gui time " << timer.elapsed() << std::endl;
-
+  qDebug() << QString("build_gui time ") << timer.elapsed();
   config_changed();
 }
 
@@ -70,6 +67,23 @@ void proplibqteditor::open_config_diag(const bool& on)
 
   if(!file_name.isEmpty())
     open_config(file_name);
+}
+
+void proplibqteditor::save_config_diag(const bool& on)
+{
+  QString file_name = QFileDialog::getSaveFileName(this,
+    tr("Save Config"), R"(D:\User_data\VC_PROJECTS\proplib\tests\prop-serialize)", tr("Config Files (*.yml *.yaml)"));
+
+  if (!file_name.isEmpty())
+  {
+    QFile file(file_name);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    std::strstream ss;
+    ss << _current_config << '\0';
+    QTextStream out(&file);
+    out << ss.str();
+    file.close();
+  }
 }
 
 void proplibqteditor::cursor_position_changed()
@@ -90,9 +104,4 @@ void proplibqteditor::config_changed()
   _yaml_viewer->clear();
   _yaml_viewer->setPlainText(ss.str());
   _yaml_viewer->verticalScrollBar()->setValue(old_scrollbar_value);
-}
-
-void proplibqteditor::timerEvent(QTimerEvent *event)
-{
-  //config_changed();
 }

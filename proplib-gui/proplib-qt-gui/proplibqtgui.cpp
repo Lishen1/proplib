@@ -40,7 +40,15 @@ class Iui_tree_elem
       _parent = prnt;
       _parent->add_child(this);
     }
+  }
 
+  virtual ~Iui_tree_elem()
+  {
+    for (Iui_tree_elem* c: _childs)
+    {
+      delete c;
+    }
+    _childs.clear();
   }
   QtnPropertySet*      get_prop_set() { return _prop_set; }
   virtual ui_build_res set_node(YAML::Node& n)
@@ -153,7 +161,8 @@ class Ui_tree_elem : public QObject, public Iui_tree_elem
   virtual void on_change(const QtnPropertyBase* changedProperty, const QtnPropertyBase* firedProperty, QtnPropertyChangeReason reason)
   {
     on_property_did_change(changedProperty, firedProperty, reason);
-    some_prop_changed(this);
+    if(reason & QtnPropertyChangeReasonNewValue || reason & QtnPropertyChangeReasonLoadedValue)
+      some_prop_changed(this);
   }
 
   virtual void on_property_did_change(const QtnPropertyBase* changedProperty, const QtnPropertyBase* firedProperty, QtnPropertyChangeReason reason)
@@ -175,7 +184,9 @@ class Ui_num_tree_elem : public Ui_tree_elem<T>
   {
     try
     {
+      std::string tag = _node.Tag();
       _node.as<YAML::Node>() = ((Ui_tree_elem<T>::Prop_type*)changedProperty)->value();
+      _node.SetTag(tag);
     }
     catch (std::exception& e)
     {
@@ -210,7 +221,9 @@ class Ui_string_tree_elem : public Ui_tree_elem<QtnPropertyQString>
   {
     try
     {
+      std::string tag = _node.Tag();
       _node.as<YAML::Node>() = std::string(((QtnPropertyQString*)changedProperty)->value().toLatin1().constData());
+      _node.SetTag(tag);
     }
     catch (std::exception& e)
     {
@@ -244,7 +257,9 @@ class Ui_bool_tree_elem : public Ui_tree_elem<QtnPropertyBool>
   {
     try
     {
+      std::string tag = _node.Tag();
       _node.as<YAML::Node>() = ((QtnPropertyBool*)changedProperty)->value();
+      _node.SetTag(tag);
     }
     catch (std::exception& e)
     {
@@ -484,11 +499,11 @@ ui_build_res build_property_tree(YAML::Node& node, Iui_tree_elem* prnt)
     res = create_simple_prop(nval, key, prnt, tag, doc_string);
     if (res != ui_build_res::not_my_type)
     {
-      if(tag == "serializable")
+      if (tag == "serializable")
         build_property_tree(nval, prnt->get_childs().back());
+
       continue;
     }
-
 
     QStringList sep_tags = tag.split(":");
     if (sep_tags.size() > 1)
@@ -598,22 +613,27 @@ proplibqtgui::proplibqtgui(QWidget* parent) : QWidget(parent)
   ui->setupUi(this);
   this->setLayout(new QHBoxLayout);
 
-  _prop_widget = std::make_shared<QtnPropertyWidget>();
-  _prop_set = std::make_shared<QtnPropertySet>(_prop_widget.get());
-
-  layout()->addWidget(_prop_widget.get());
-
-  _prop_widget->setPropertySet(_prop_set.get());
-
-  _root = new Ui_tree_root(nullptr, _prop_set.get());
-
+  //_prop_widget = std::make_shared<QtnPropertyWidget>();
+  //layout()->addWidget(_prop_widget.get());
 }
 
 ui_build_res proplibqtgui::build_gui(YAML::Node& n)
 {
+
+  if (_prop_widget.get())
+    layout()->removeWidget(_prop_widget.get());
+
+  _prop_widget = std::make_shared<QtnPropertyWidget>();
+  layout()->addWidget(_prop_widget.get());
+
+  _prop_set = new QtnPropertySet(_prop_widget.get());
+
+  _root = std::make_shared<Ui_tree_root>(nullptr, _prop_set);
   _yaml_node = n;
-  ui_build_res res = build_property_tree(n, _root);
-  _prop_widget->setPropertySet(_prop_set.get());
+  ui_build_res res = build_property_tree(n, _root.get());
+  _prop_widget->setPropertySet(_prop_set);
+  //set callback after loading to not trig it so usual
+  _root->set_some_prop_changed_callback(_some_prop_changed_callback);
 
   return res;
 }
@@ -626,5 +646,5 @@ ui_build_res proplibqtgui::update_gui(YAML::Node& n)
 
 void proplibqtgui::set_some_prop_changed_callback(std::function<void(Iui_tree_elem*)> f)
 {
-  _root->set_some_prop_changed_callback(f);
+  _some_prop_changed_callback = f;
 }

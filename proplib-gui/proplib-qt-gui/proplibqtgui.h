@@ -33,9 +33,10 @@ public:
 private:
     Ui::proplibqtguiClass* ui;
     YAML::Node _yaml_node;
-    Ui_tree_root* _root;
+    std::shared_ptr<Ui_tree_root> _root;
     std::shared_ptr<QtnPropertyWidget> _prop_widget;
-    std::shared_ptr<QtnPropertySet> _prop_set;
+    QtnPropertySet* _prop_set = nullptr;
+    std::function<void(Iui_tree_elem*)> _some_prop_changed_callback;
 
 protected:
 
