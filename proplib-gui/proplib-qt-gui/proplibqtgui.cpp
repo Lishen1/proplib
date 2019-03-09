@@ -1,4 +1,5 @@
 #include "proplibqtgui.h"
+#include "ui_proplibqtgui.h"
 
 #include <QtnProperty/Core/PropertyCore.h>
 #include <QtnProperty/Core/QObjectPropertySet.h>
@@ -35,7 +36,11 @@ class Iui_tree_elem
   Iui_tree_elem(Iui_tree_elem* prnt, QtnPropertySet* prop_set) : _prop_set(prop_set)
   {
     if (prnt)
-      prnt->add_child(this);
+    {
+      _parent = prnt;
+      _parent->add_child(this);
+    }
+
   }
   QtnPropertySet*      get_prop_set() { return _prop_set; }
   virtual ui_build_res set_node(YAML::Node& n)
@@ -51,6 +56,22 @@ class Iui_tree_elem
     return set_val();
   }
 
+  virtual void some_prop_changed(Iui_tree_elem* p)
+  {
+    if (_parent)
+    {
+      _parent->some_prop_changed(p);
+    }
+
+    if (_some_prop_changed_callback)
+      _some_prop_changed_callback(p);
+  }
+
+  void set_some_prop_changed_callback(std::function<void(Iui_tree_elem*)> f)
+  {
+    _some_prop_changed_callback = f;
+  }
+
   void                       add_child(Iui_tree_elem* child) { _childs.push_back(child); }
   std::list<Iui_tree_elem*>& get_childs() { return _childs; };
 
@@ -63,6 +84,7 @@ class Iui_tree_elem
   Iui_tree_elem*               _parent   = nullptr;
   QtnPropertySet*              _prop_set = nullptr;
   std::list<Iui_tree_elem*>    _childs;
+  std::function<void(Iui_tree_elem*)> _some_prop_changed_callback;
 };
 
 class Ui_tree_root : public Iui_tree_elem
@@ -123,10 +145,17 @@ class Ui_tree_elem : public QObject, public Iui_tree_elem
     _prop = new T(_prop_set);
     _prop->setName(name);
     _prop->setDescription(doc_string);
-    QObject::connect(_prop, &QtnProperty::propertyDidChange, this, &Ui_tree_elem<T>::on_property_did_change);
+    QObject::connect(_prop, &QtnProperty::propertyDidChange, this, &Ui_tree_elem<T>::on_change);
   }
 
   private:
+
+  virtual void on_change(const QtnPropertyBase* changedProperty, const QtnPropertyBase* firedProperty, QtnPropertyChangeReason reason)
+  {
+    on_property_did_change(changedProperty, firedProperty, reason);
+    some_prop_changed(this);
+  }
+
   virtual void on_property_did_change(const QtnPropertyBase* changedProperty, const QtnPropertyBase* firedProperty, QtnPropertyChangeReason reason)
       = 0;
 
@@ -565,22 +594,28 @@ void bypass_prop(QtnPropertySet* ps)
 
 proplibqtgui::proplibqtgui(QWidget* parent) : QWidget(parent)
 {
-  ui.setupUi(this);
+  ui = new Ui::proplibqtguiClass;
+  ui->setupUi(this);
   this->setLayout(new QHBoxLayout);
-  QtnPropertyWidget* centralWidget = new QtnPropertyWidget();
 
-  auto m_propertySet = new QtnPropertySet(centralWidget);
+  _prop_widget = std::make_shared<QtnPropertyWidget>();
+  _prop_set = std::make_shared<QtnPropertySet>(_prop_widget.get());
 
-  this->layout()->addWidget(centralWidget);
-  _root = new Ui_tree_root(nullptr, m_propertySet);
-  centralWidget->setPropertySet(m_propertySet);
-  startTimer(5000);
+  layout()->addWidget(_prop_widget.get());
+
+  _prop_widget->setPropertySet(_prop_set.get());
+
+  _root = new Ui_tree_root(nullptr, _prop_set.get());
+
 }
 
 ui_build_res proplibqtgui::build_gui(YAML::Node& n)
 {
   _yaml_node = n;
-  return build_property_tree(n, _root);
+  ui_build_res res = build_property_tree(n, _root);
+  _prop_widget->setPropertySet(_prop_set.get());
+
+  return res;
 }
 
 ui_build_res proplibqtgui::update_gui(YAML::Node& n)
@@ -589,8 +624,7 @@ ui_build_res proplibqtgui::update_gui(YAML::Node& n)
   return _root->set_node(n);
 }
 
-void proplibqtgui::timerEvent(QTimerEvent* event)
+void proplibqtgui::set_some_prop_changed_callback(std::function<void(Iui_tree_elem*)> f)
 {
-  std::cout << "yaml\n" << _yaml_node << std::endl;
-  std::cout << "timer event\n";
+  _root->set_some_prop_changed_callback(f);
 }
