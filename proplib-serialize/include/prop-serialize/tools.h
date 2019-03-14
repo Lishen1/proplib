@@ -81,17 +81,15 @@ namespace proplib
   {
   };
 
+  template <class T>
+  constexpr std::string type_name();
+
   inline std::string std_vector_typename(...) { return std::string("is_not_vector_type"); }
 
   template <class T>
   constexpr std::string std_vector_typename(std::vector<T> v)
   {
-    std::string val = "unknown";
-    if (std::is_arithmetic<T>::value)
-      val = typeid(T).name();
-    else if (std::is_same<T, std::string>::value)
-      val = "string";
-    return val;
+    return type_name<T>();
   }
 
   inline std::string std_map_typename(...) { return std::string("is_not_map_type"); }
@@ -99,18 +97,8 @@ namespace proplib
   template <class T, class V>
   constexpr std::string std_map_typename(std::map<T, V> v)
   {
-    std::string key = "unknown";
-    if (std::is_arithmetic<T>::value)
-      key = typeid(T).name();
-    else if (std::is_same<T, std::string>::value)
-      key = "string";
-
-    std::string val = "unknown";
-    if (std::is_arithmetic<V>::value)
-      val = typeid(V).name();
-    else if (std::is_same<V, std::string>::value)
-      val = "string";
-
+    std::string key = type_name<T>();
+    std::string val = type_name<V>();
     return key + std::string(":") + val;
   }
 
@@ -141,6 +129,8 @@ namespace proplib
         name = "double";
       else if (std::is_same<T, float>::value)
         name = "float";
+      else if (std::is_same<T, bool>::value)
+        name = "bool";
     }
     else if (std::is_same<T, std::string>::value)
       name = "string";

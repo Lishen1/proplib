@@ -4,6 +4,8 @@
 #include <QtWidgets/QTextEdit>
 #include "ui_proplibqteditor.h"
 #include <yaml-cpp/yaml.h>
+#include <mutex>
+#include "QMap"
 
 class proplibqtgui;
 
@@ -25,6 +27,12 @@ private:
     QTextEdit* _yaml_viewer;
     QTextCursor _yaml_viewer_cursor;
     YAML::Node _current_config;
+    std::mutex _server_mutex;
+
+    QMap<QString, QByteArray> _server_request;
+    QMap<QString, uint32_t> _has_request;
+
 protected:
+  virtual void timerEvent(QTimerEvent *event) override;
 
 };

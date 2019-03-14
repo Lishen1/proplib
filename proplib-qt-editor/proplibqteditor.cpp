@@ -9,6 +9,17 @@
 #include <QDebug>
 #include "Yaml_highlighter.h"
 #include <QFile>
+#include "httplib.h"
+struct Http_urls
+{
+  const static std::string build_gui_url;
+  const static std::string update_gui_url;
+  const static std::string update_struct_url;
+};
+
+const std::string Http_urls::build_gui_url = "/build_gui";
+const std::string Http_urls::update_gui_url = "/update_gui";
+const std::string Http_urls::update_struct_url = "/update_struct";
 
 proplibqteditor::proplibqteditor(QWidget *parent)
     : QMainWindow(parent)
@@ -45,7 +56,44 @@ proplibqteditor::proplibqteditor(QWidget *parent)
     QObject::connect(ui.actionSave_Config, &QAction::triggered, this, &proplibqteditor::save_config_diag);
     QObject::connect(_yaml_viewer, &QTextEdit::cursorPositionChanged, this, &proplibqteditor::cursor_position_changed);
 
-    open_config(R"(D:\User_data\VC_PROJECTS\proplib\tests\prop-serialize\test.yml)");
+
+    std::thread* th = new std::thread([this]()
+    {
+      httplib::Server svr;
+
+      svr.Post(Http_urls::build_gui_url.c_str(), [&](const httplib::Request& req, httplib::Response& res)
+      {
+        _server_mutex.lock();
+        //res.set_content(req.matches[1], "text/plain");
+        _server_request[Http_urls::build_gui_url.c_str()] = QByteArray(req.body.c_str(), req.body.size());
+        _has_request[Http_urls::build_gui_url.c_str()] = 1;
+        _server_mutex.unlock();
+      });
+
+      svr.Post(Http_urls::update_gui_url.c_str(), [&](const httplib::Request& req, httplib::Response& res)
+      {
+        _server_mutex.lock();
+        //res.set_content(req.matches[1], "text/plain");
+        _server_request[Http_urls::update_gui_url.c_str()] = QByteArray(req.body.c_str(), req.body.size());
+        _has_request[Http_urls::update_gui_url.c_str()] = 1;
+        _server_mutex.unlock();
+      });
+
+      svr.Get(Http_urls::update_struct_url.c_str(), [&](const httplib::Request& req, httplib::Response& res)
+      {
+        _server_mutex.lock();
+        std::strstream ss;
+        ss << _current_config << '\0';
+        res.set_content(ss.str(), "text/plain");
+        _server_mutex.unlock();
+      });
+
+      svr.listen("localhost", 1234);
+    });
+    
+    startTimer(1);
+
+    //open_config(R"(D:\User_data\VC_PROJECTS\proplib\tests\prop-serialize\test.yml)");
 }
 
 
@@ -104,4 +152,40 @@ void proplibqteditor::config_changed()
   _yaml_viewer->clear();
   _yaml_viewer->setPlainText(ss.str());
   _yaml_viewer->verticalScrollBar()->setValue(old_scrollbar_value);
+}
+
+void proplibqteditor::timerEvent(QTimerEvent *event)
+{
+  if (_has_request[Http_urls::build_gui_url.c_str()])
+  {
+    _server_mutex.lock();
+    //qDebug() << _server_request[Http_urls::build_gui_url.c_str()];
+
+    _current_config = YAML::Load(_server_request[Http_urls::build_gui_url.c_str()].constData());
+
+    QElapsedTimer timer;
+    timer.start();
+    _prop_gui->build_gui(_current_config);
+    _prop_gui->update_gui(_current_config);
+    qDebug() << QString("build_gui time ") << timer.elapsed();
+    config_changed();
+    _server_mutex.unlock();
+    _has_request[Http_urls::build_gui_url.c_str()] = 0;
+  }
+
+  if (_has_request[Http_urls::update_gui_url.c_str()])
+  {
+    _server_mutex.lock();
+
+    _current_config = YAML::Load(_server_request[Http_urls::update_gui_url.c_str()].constData());
+
+    QElapsedTimer timer;
+    timer.start();
+    _prop_gui->update_gui(_current_config);
+    qDebug() << QString("update_gui time ") << timer.elapsed();
+    config_changed();
+    _server_mutex.unlock();
+    _has_request[Http_urls::update_gui_url.c_str()] = 0;
+  }
+
 }

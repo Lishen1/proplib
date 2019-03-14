@@ -46,12 +46,12 @@ Yaml_highlighter::Yaml_highlighter(QTextDocument *parent /*= 0*/) : QSyntaxHighl
 
   classFormat.setFontWeight(QFont::Bold);
   classFormat.setForeground(Qt::darkMagenta);
-  rule.pattern = QRegularExpression("\\bQ[A-Za-z]+\\b");
+  rule.pattern = QRegularExpression("\|");
   rule.format  = classFormat;
   highlightingRules.append(rule);
 
   quotationFormat.setForeground(Qt::darkGreen);
-  rule.pattern = QRegularExpression("\".*\"");
+  rule.pattern = QRegularExpression("\\[bBAZzG]|\^|\$");
   rule.format  = quotationFormat;
   highlightingRules.append(rule);
 
@@ -64,6 +64,11 @@ Yaml_highlighter::Yaml_highlighter(QTextDocument *parent /*= 0*/) : QSyntaxHighl
   singleLineCommentFormat.setForeground(Qt::red);
   rule.pattern = QRegularExpression("//[^\n]*");
   rule.format  = singleLineCommentFormat;
+  highlightingRules.append(rule);
+
+  numberFormat.setForeground(Qt::red);
+  rule.pattern = QRegularExpression(R"(\W[0-9]{1,9}(\.{0,}[0-9]{0,}))");
+  rule.format = numberFormat;
   highlightingRules.append(rule);
 
   multiLineCommentFormat.setForeground(Qt::red);

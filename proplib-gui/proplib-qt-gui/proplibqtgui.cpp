@@ -13,6 +13,7 @@
 #include <QDebug>
 
 #include <iostream>
+#include "../../proplib-serialize/include/prop-serialize/tools.h"
 
 class Iui_tree_elem;
 
@@ -44,7 +45,7 @@ class Iui_tree_elem
 
   virtual ~Iui_tree_elem()
   {
-    for (Iui_tree_elem* c: _childs)
+    for (Iui_tree_elem* c : _childs)
     {
       delete c;
     }
@@ -59,7 +60,7 @@ class Iui_tree_elem
 
   virtual ui_build_res set_node(YAML::detail::iterator_value it)
   {
-    _node_iter.first = it.first;
+    _node_iter.first  = it.first;
     _node_iter.second = it.second;
     return set_val();
   }
@@ -75,10 +76,7 @@ class Iui_tree_elem
       _some_prop_changed_callback(p);
   }
 
-  void set_some_prop_changed_callback(std::function<void(Iui_tree_elem*)> f)
-  {
-    _some_prop_changed_callback = f;
-  }
+  void set_some_prop_changed_callback(std::function<void(Iui_tree_elem*)> f) { _some_prop_changed_callback = f; }
 
   void                       add_child(Iui_tree_elem* child) { _childs.push_back(child); }
   std::list<Iui_tree_elem*>& get_childs() { return _childs; };
@@ -87,11 +85,11 @@ class Iui_tree_elem
   virtual ui_build_res set_val() = 0;
 
   protected:
-  YAML::Node                   _node;
-  YAML::detail::iterator_value _node_iter;
-  Iui_tree_elem*               _parent   = nullptr;
-  QtnPropertySet*              _prop_set = nullptr;
-  std::list<Iui_tree_elem*>    _childs;
+  YAML::Node                          _node;
+  YAML::detail::iterator_value        _node_iter;
+  Iui_tree_elem*                      _parent   = nullptr;
+  QtnPropertySet*                     _prop_set = nullptr;
+  std::list<Iui_tree_elem*>           _childs;
   std::function<void(Iui_tree_elem*)> _some_prop_changed_callback;
 };
 
@@ -123,10 +121,10 @@ class Ui_tree_root : public Iui_tree_elem
 
 class Ui_pair_elem : public Iui_tree_elem
 {
-public:
+  public:
   Ui_pair_elem(Iui_tree_elem* prnt, QtnPropertySet* prop_set) : Iui_tree_elem(prnt, prop_set) {}
 
-protected:
+  protected:
   virtual ui_build_res set_val() override
   {
     if (_childs.size() != 2)
@@ -151,17 +149,17 @@ class Ui_tree_elem : public QObject, public Iui_tree_elem
   Ui_tree_elem(const QString& name, const QString& doc_string, Iui_tree_elem* prnt) : Iui_tree_elem(prnt, prnt->get_prop_set())
   {
     _prop = new T(_prop_set);
+
     _prop->setName(name);
     _prop->setDescription(doc_string);
     QObject::connect(_prop, &QtnProperty::propertyDidChange, this, &Ui_tree_elem<T>::on_change);
   }
 
   private:
-
   virtual void on_change(const QtnPropertyBase* changedProperty, const QtnPropertyBase* firedProperty, QtnPropertyChangeReason reason)
   {
     on_property_did_change(changedProperty, firedProperty, reason);
-    if(reason & QtnPropertyChangeReasonNewValue || reason & QtnPropertyChangeReasonLoadedValue)
+    if (reason & QtnPropertyChangeReasonNewValue || reason & QtnPropertyChangeReasonLoadedValue)
       some_prop_changed(this);
   }
 
@@ -184,7 +182,7 @@ class Ui_num_tree_elem : public Ui_tree_elem<T>
   {
     try
     {
-      std::string tag = _node.Tag();
+      std::string tag        = _node.Tag();
       _node.as<YAML::Node>() = ((Ui_tree_elem<T>::Prop_type*)changedProperty)->value();
       _node.SetTag(tag);
     }
@@ -221,7 +219,7 @@ class Ui_string_tree_elem : public Ui_tree_elem<QtnPropertyQString>
   {
     try
     {
-      std::string tag = _node.Tag();
+      std::string tag        = _node.Tag();
       _node.as<YAML::Node>() = std::string(((QtnPropertyQString*)changedProperty)->value().toLatin1().constData());
       _node.SetTag(tag);
     }
@@ -257,7 +255,7 @@ class Ui_bool_tree_elem : public Ui_tree_elem<QtnPropertyBool>
   {
     try
     {
-      std::string tag = _node.Tag();
+      std::string tag        = _node.Tag();
       _node.as<YAML::Node>() = ((QtnPropertyBool*)changedProperty)->value();
       _node.SetTag(tag);
     }
@@ -391,13 +389,20 @@ template <typename T>
 ui_build_res create_numeric_property(YAML::Node& ch, const QString& name, Iui_tree_elem* prnt, const QString& doc_string)
 {
   typedef std::conditional<std::is_same<T, float>::value, QtnPropertyFloat, void>::type A;
-  typedef std::conditional<std::is_same<T, int>::value, QtnPropertyInt, A>::type        B;
-  typedef std::conditional<std::is_same<T, double>::value, QtnPropertyDouble, B>::type  C;
+  typedef std::conditional<std::is_same<T, double>::value, QtnPropertyDouble, A>::type  B;
+  typedef std::conditional<std::is_same<T, uint8_t>::value, QtnPropertyUInt, B>::type   C;
+  typedef std::conditional<std::is_same<T, uint16_t>::value, QtnPropertyUInt, C>::type  D;
+  typedef std::conditional<std::is_same<T, uint32_t>::value, QtnPropertyUInt, D>::type  E;
+  typedef std::conditional<std::is_same<T, uint64_t>::value, QtnPropertyUInt, E>::type  F;
+  typedef std::conditional<std::is_same<T, int8_t>::value, QtnPropertyInt, F>::type     G;
+  typedef std::conditional<std::is_same<T, int16_t>::value, QtnPropertyInt, G>::type    J;
+  typedef std::conditional<std::is_same<T, int32_t>::value, QtnPropertyInt, J>::type    K;
+  typedef std::conditional<std::is_same<T, int64_t>::value, QtnPropertyInt, K>::type    M;
 
   try
   {
 
-    auto elem = new Ui_num_tree_elem<C, T>(name, doc_string, prnt);
+    auto elem = new Ui_num_tree_elem<M, T>(name, doc_string, prnt);
     return elem->set_node(ch);
   }
   catch (const YAML::Exception& e)
@@ -411,7 +416,7 @@ template <typename T>
 ui_build_res select_n_create_numeric_property(YAML::Node& ch, const QString& name, Iui_tree_elem* prnt, const QString& type_name,
                                               const QString& doc_string)
 {
-  if (typeid(T).name() == type_name)
+  if (proplib::type_name<T>().c_str() == type_name)
     return create_numeric_property<T>(ch, name, prnt, doc_string);
   return ui_build_res::not_my_type;
 }
@@ -454,7 +459,23 @@ ui_build_res create_simple_prop(YAML::Node& ch, const QString& name, Iui_tree_el
   if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
     res = select_n_create_numeric_property<double>(ch, name, prnt, tag, doc_string);
   if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
-    res = select_n_create_numeric_property<int>(ch, name, prnt, tag, doc_string);
+    res = select_n_create_numeric_property<float>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<uint8_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<uint16_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<uint32_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<uint64_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<int8_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<int16_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<int32_t>(ch, name, prnt, tag, doc_string);
+  if (res != ui_build_res::success && res != ui_build_res::type_cast_error)
+    res = select_n_create_numeric_property<int64_t>(ch, name, prnt, tag, doc_string);
 
   if (res != ui_build_res::not_my_type)
     return res;
@@ -614,7 +635,7 @@ proplibqtgui::proplibqtgui(QWidget* parent) : QWidget(parent)
   this->setLayout(new QHBoxLayout);
 
   //_prop_widget = std::make_shared<QtnPropertyWidget>();
-  //layout()->addWidget(_prop_widget.get());
+  // layout()->addWidget(_prop_widget.get());
 }
 
 ui_build_res proplibqtgui::build_gui(YAML::Node& n)
@@ -628,11 +649,11 @@ ui_build_res proplibqtgui::build_gui(YAML::Node& n)
 
   _prop_set = new QtnPropertySet(_prop_widget.get());
 
-  _root = std::make_shared<Ui_tree_root>(nullptr, _prop_set);
-  _yaml_node = n;
+  _root            = std::make_shared<Ui_tree_root>(nullptr, _prop_set);
+  _yaml_node       = n;
   ui_build_res res = build_property_tree(n, _root.get());
   _prop_widget->setPropertySet(_prop_set);
-  //set callback after loading to not trig it so usual
+  // set callback after loading to not trig it so usual
   _root->set_some_prop_changed_callback(_some_prop_changed_callback);
 
   return res;

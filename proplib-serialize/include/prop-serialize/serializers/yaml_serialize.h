@@ -24,7 +24,7 @@ namespace proplib
     typename std::enable_if<(!std::is_same<Serializable, typename clear_type<T>::type>::value), typename clear_type<T>::type*>::type
     new_derived_serializable()
     {
-      return new clear_type<T>::type;
+      return new typename clear_type<T>::type;
     }
 
     template <class T>
@@ -317,7 +317,7 @@ namespace proplib
 
         for (auto n : nodes)
         {
-          T s = new clear_type<T>::type();
+          T s = new typename clear_type<T>::type();
           s->set_logger(logger_id);
           res_t res = s->deserialize(n);
           if (res == res_t::error)
