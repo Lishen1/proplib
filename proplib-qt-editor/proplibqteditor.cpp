@@ -64,7 +64,6 @@ proplibqteditor::proplibqteditor(QWidget *parent)
       svr.Post(Http_urls::build_gui_url.c_str(), [&](const httplib::Request& req, httplib::Response& res)
       {
         _server_mutex.lock();
-        //res.set_content(req.matches[1], "text/plain");
         _server_request[Http_urls::build_gui_url.c_str()] = QByteArray(req.body.c_str(), req.body.size());
         _has_request[Http_urls::build_gui_url.c_str()] = 1;
         _server_mutex.unlock();
@@ -73,7 +72,6 @@ proplibqteditor::proplibqteditor(QWidget *parent)
       svr.Post(Http_urls::update_gui_url.c_str(), [&](const httplib::Request& req, httplib::Response& res)
       {
         _server_mutex.lock();
-        //res.set_content(req.matches[1], "text/plain");
         _server_request[Http_urls::update_gui_url.c_str()] = QByteArray(req.body.c_str(), req.body.size());
         _has_request[Http_urls::update_gui_url.c_str()] = 1;
         _server_mutex.unlock();
@@ -106,6 +104,7 @@ void proplibqteditor::open_config(const QString& path)
   _prop_gui->update_gui(_current_config);
   qDebug() << QString("build_gui time ") << timer.elapsed();
   config_changed();
+  this->adjustSize();
 }
 
 void proplibqteditor::open_config_diag(const bool& on)
@@ -167,6 +166,7 @@ void proplibqteditor::timerEvent(QTimerEvent *event)
     timer.start();
     _prop_gui->build_gui(_current_config);
     _prop_gui->update_gui(_current_config);
+    this->adjustSize();
     qDebug() << QString("build_gui time ") << timer.elapsed();
     config_changed();
     _server_mutex.unlock();

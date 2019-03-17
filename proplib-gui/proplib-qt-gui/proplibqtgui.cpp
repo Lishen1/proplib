@@ -149,6 +149,7 @@ class Ui_tree_elem : public QObject, public Iui_tree_elem
   Ui_tree_elem(const QString& name, const QString& doc_string, Iui_tree_elem* prnt) : Iui_tree_elem(prnt, prnt->get_prop_set())
   {
     _prop = new T(_prop_set);
+    _prop_set->addChildProperty(_prop);
 
     _prop->setName(name);
     _prop->setDescription(doc_string);
@@ -287,6 +288,7 @@ class Ui_vec_tree_elem : public Iui_tree_elem
   Ui_vec_tree_elem(const QString& name, const QString& doc_string, const QString& v_type, Iui_tree_elem* prnt)
   : Iui_tree_elem(prnt, new QtnPropertySet(prnt->get_prop_set())), _v_type(v_type)
   {
+    prnt->get_prop_set()->addChildProperty(_prop_set);
     _prop_set->setName(name);
     _prop_set->setDescription(doc_string);
   }
@@ -322,6 +324,7 @@ class Ui_map_tree_elem : public Iui_tree_elem
   Ui_map_tree_elem(const QString& name, const QString& doc_string, const QString& k_type, const QString& v_type, Iui_tree_elem* prnt)
   : Iui_tree_elem(prnt, new QtnPropertySet(prnt->get_prop_set())), _k_type(k_type), _v_type(v_type)
   {
+    prnt->get_prop_set()->addChildProperty(_prop_set);
     _prop_set->setName(name);
     _prop_set->setDescription(doc_string);
   }
@@ -360,6 +363,7 @@ class Ui_serial_tree_elem : public Iui_tree_elem
   Ui_serial_tree_elem(const QString& name, const QString& doc_string, Iui_tree_elem* prnt, YAML::Node& node)
   : Iui_tree_elem(prnt, new QtnPropertySet(prnt->get_prop_set()))
   {
+    prnt->get_prop_set()->addChildProperty(_prop_set);
     _prop_set->setName(name);
     _prop_set->setDescription(doc_string);
   }
@@ -578,6 +582,7 @@ ui_build_res build_property_tree(YAML::Node& node, Iui_tree_elem* prnt)
         {
 
           QtnPropertySet* m_prop_set = new QtnPropertySet(vec_prop->get_prop_set());
+          vec_prop->get_prop_set()->addChildProperty(m_prop_set);
 
           m_prop_set->setName(QString("[%1]").arg(idx));
 
@@ -634,25 +639,21 @@ proplibqtgui::proplibqtgui(QWidget* parent) : QWidget(parent)
   ui->setupUi(this);
   this->setLayout(new QHBoxLayout);
 
-  //_prop_widget = std::make_shared<QtnPropertyWidget>();
-  // layout()->addWidget(_prop_widget.get());
+  _prop_widget = std::make_shared<QtnPropertyWidget>();
+  layout()->addWidget(_prop_widget.get());
+
+  _prop_set = new QtnPropertySet(_prop_widget.get());
+  _root = std::make_shared<Ui_tree_root>(nullptr, _prop_set);
+  _prop_widget->setPropertySet(_prop_set);
 }
 
 ui_build_res proplibqtgui::build_gui(YAML::Node& n)
 {
 
-  if (_prop_widget.get())
-    layout()->removeWidget(_prop_widget.get());
-
-  _prop_widget = std::make_shared<QtnPropertyWidget>();
-  layout()->addWidget(_prop_widget.get());
-
-  _prop_set = new QtnPropertySet(_prop_widget.get());
-
-  _root            = std::make_shared<Ui_tree_root>(nullptr, _prop_set);
   _yaml_node       = n;
   ui_build_res res = build_property_tree(n, _root.get());
-  _prop_widget->setPropertySet(_prop_set);
+  //this->adjustSize();
+
   // set callback after loading to not trig it so usual
   _root->set_some_prop_changed_callback(_some_prop_changed_callback);
 

@@ -5,57 +5,57 @@ c1: !<serializable>
   bool_field_doc: !<doc> just bool
   float_field: !<float> 0.2977996
   float_field_doc: !<doc> just float
-  int_field: !<int> 24221
+  int_field: !<int32_t> 24221
   int_field_doc: !<doc> just int
-  map_int_string: !<map:int:string>
+  map_int_string: !<map:int32_t:string>
     24350: zMCk8
   map_int_string_doc: !<doc> map int <-> string
   string_field: !<string> oaMeAjSWfchoZYFYZ5B6
   string_field_doc: !<doc> it is string!
   vector_float: !<vector:float> [0.8469802, 0.4560991, 0.9829707]
   vector_float_doc: !<doc> this is vector of floats
-  vector_int: !<vector:int> [12287, 10383, 8909]
+  vector_int: !<vector:int32_t> [12287, 10383, 8909]
   vector_int_doc: !<doc> this is vector of integers
 c2: !<serializable>
   bool_field: !<bool> false
   bool_field_doc: !<doc> just bool
   float_field: !<float> 0.001617481
   float_field_doc: !<doc> just float
-  int_field: !<int> 1999
+  int_field: !<int32_t> 1999
   int_field_doc: !<doc> just int
-  map_int_string: !<map:int:string>
+  map_int_string: !<map:int32_t:string>
     20600: fRyil
   map_int_string_doc: !<doc> map int <-> string
   string_field: !<string> 6cI6NX8DYdD3ojxSnqPT
   string_field_doc: !<doc> it is string!
   vector_float: !<vector:float> [0.7079989, 0.7472152, 0.1444746]
   vector_float_doc: !<doc> this is vector of floats
-  vector_int: !<vector:int> [27348, 19668, 8281]
+  vector_int: !<vector:int32_t> [27348, 19668, 8281]
   vector_int_doc: !<doc> this is vector of integers
 c3: !<serializable>
   bool_field: !<bool> true
   bool_field_doc: !<doc> just bool
   float_field: !<float> 0.6251717
   float_field_doc: !<doc> just float
-  int_field: !<int> 3093
+  int_field: !<int32_t> 3093
   int_field_doc: !<doc> just int
-  map_int_string: !<map:int:string>
+  map_int_string: !<map:int32_t:string>
     12292: OzOLM
   map_int_string_doc: !<doc> map int <-> string
   string_field: !<string> LJboH8S4kwIgTxSl1C00
   string_field_doc: !<doc> it is string!
   vector_float: !<vector:float> [0.1783502, 0.4574419, 0.09750663]
   vector_float_doc: !<doc> this is vector of floats
-  vector_int: !<vector:int> [11008, 32609, 32702]
+  vector_int: !<vector:int32_t> [11008, 32609, 32702]
   vector_int_doc: !<doc> this is vector of integers
 test_class_1_field: !<serializable>
   bool_field: !<bool> true
   bool_field_doc: !<doc> just bool
   float_field: !<float> 0.8772545
   float_field_doc: !<doc> just float
-  int_field: !<int> 26924
+  int_field: !<int32_t> 26924
   int_field_doc: !<doc> just int
-  map_int_string: !<map:int:string>
+  map_int_string: !<map:int32_t:string>
     1842: eaoEi
     21724: GKjxR
   map_int_string_doc: !<doc> map int <-> string
@@ -63,7 +63,7 @@ test_class_1_field: !<serializable>
   string_field_doc: !<doc> it is string!
   vector_float: !<vector:float> [0.7833186, 0.5198828, 0.8759727, 0.4265572, 0.9666128, 0.1532334]
   vector_float_doc: !<doc> this is vector of floats
-  vector_int: !<vector:int> [19912, 26299, 9894, 9930, 2306, 22386]
+  vector_int: !<vector:int32_t> [19912, 26299, 9894, 9930, 2306, 22386]
   vector_int_doc: !<doc> this is vector of integers
 test_class_1_field_doc: !<doc> just field of class_1
 vector_test_class_1: !<vector:serializable>
@@ -71,31 +71,30 @@ vector_test_class_1: !<vector:serializable>
     bool_field_doc: !<doc> just bool
     float_field: !<float> 0.3502915
     float_field_doc: !<doc> just float
-    int_field: !<int> 29358
+    int_field: !<int32_t> 29358
     int_field_doc: !<doc> just int
-    map_int_string: !<map:int:string>
+    map_int_string: !<map:int32_t:string>
       19718: trQF6
-      19799: txxxx
     map_int_string_doc: !<doc> map int <-> string
     string_field: !<string> sa1xVPfvJcrgRYwTiizs
     string_field_doc: !<doc> it is string!
     vector_float: !<vector:float> [0.5635853, 0.8087405, 0.479873]
     vector_float_doc: !<doc> this is vector of floats
-    vector_int: !<vector:int> [41, 6334, 19169]
+    vector_int: !<vector:int32_t> [41, 6334, 19169]
     vector_int_doc: !<doc> this is vector of integers
   - bool_field: !<bool> false
     bool_field_doc: !<doc> just bool
     float_field: !<float> 0.4579608
     float_field_doc: !<doc> just float
-    int_field: !<int> 31101
+    int_field: !<int32_t> 31101
     int_field_doc: !<doc> just int
-    map_int_string: !<map:int:string>
+    map_int_string: !<map:int32_t:string>
       22929: nxrpM
     map_int_string_doc: !<doc> map int <-> string
     string_field: !<string> REbbSqWy6yhKIDCdJOya
     string_field_doc: !<doc> it is string!
     vector_float: !<vector:float> [0.7264931, 0.2053591, 0.4684591]
     vector_float_doc: !<doc> this is vector of floats
-    vector_int: !<vector:int> [27446, 15890, 24370]
+    vector_int: !<vector:int32_t> [27446, 15890, 24370]
     vector_int_doc: !<doc> this is vector of integers
 vector_test_class_1_doc: !<doc> vector contained instances of class_1
