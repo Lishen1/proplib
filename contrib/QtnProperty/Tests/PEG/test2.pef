@@ -1,0 +1,31 @@
+#include_h "PropertyCore.h"
+
+property_set A
+{
+    id = 50;
+    Bool b
+    {
+        id = 51;
+        value = true;
+        description = "b property";
+        delegate Combobox
+        {
+            labelTrue = "On";
+            labelFalse = "Off";
+        }
+    }
+
+    code_h
+    {
+        public:
+            void setOwner(int a);
+    }
+
+    code_cpp
+    {
+        void QtnPropertySetA::setOwner(int a)
+        {
+            b = (bool)a;
+        }
+    }
+};
