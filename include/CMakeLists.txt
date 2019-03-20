@@ -1,0 +1,10 @@
+set (PROP_SERIALIZE_HEADER 
+  ${CMAKE_CURRENT_SOURCE_DIR}/config.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/proplib.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/serializable.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/serialize.h  
+  ${CMAKE_CURRENT_SOURCE_DIR}/serializers/yaml_serialize.h 
+  ${CMAKE_CURRENT_SOURCE_DIR}/tools.h  
+  ${CMAKE_CURRENT_SOURCE_DIR}/types.h)
+  
+target_sources(${PROP_TARGET} PRIVATE ${PROP_SERIALIZE_HEADER})

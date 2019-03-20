@@ -1,0 +1,6 @@
+Name: easyloggingpp
+Description: Feature-rich single header C++ logging library
+Version: 9.96.2
+prefix=F:/development/cpp/libs/easyloggingpp/build/Easyloggingpp
+includedir=F:/development/cpp/libs/easyloggingpp/build/Easyloggingpp/include
+Cflags: -I${includedir}
