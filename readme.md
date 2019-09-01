@@ -1,5 +1,5 @@
 # Properties serialization library
-**oproplib** is a set of crossplatform c++11 libraries and tools which allow serialize, deserialize, visualize and edit c++ objects without codegeneration what well suitable for algorithms  properties configuration.
+**proplib** is a set of crossplatform c++11 libraries and tools which allow serialize, deserialize, visualize and edit c++ objects without codegeneration what well suitable for algorithms  properties configuration.
 
 ## Example of usage
 
