@@ -74,17 +74,9 @@ target_include_directories(staticQtnProperty PRIVATE
 	${Qt5Widgets_INCLUDE_DIRS} 
 	${Qt5Declarative_INCLUDE_DIRS} 
 	${Qt5Script_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/contrib 
-	${CMAKE_SOURCE_DIR}/contrib/QtnProperty 
-	${CMAKE_SOURCE_DIR}/contrib/QtnProperty/Core
-	${CMAKE_SOURCE_DIR}/contrib/QtnProperty/PropertyWidget)
+	${CMAKE_CURRENT_SOURCE_DIR} 
+	${CMAKE_CURRENT_SOURCE_DIR}/Core
+  ${CMAKE_CURRENT_SOURCE_DIR}/PropertyWidget)
 	
 target_link_libraries(staticQtnProperty PRIVATE ${Qt5Widgets_LIBRARIES} ${Qt5Declarative_LIBRARIES} ${Qt5Script_LIBRARIES})
-
-#set (PROP_CONTRIB_HEADER 
-#  ${CMAKE_CURRENT_SOURCE_DIR}/Easyloggingpp/easylogging++.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/Easyloggingpp/easylogging++.cc
-#  
-#  CACHE STRING "" )
- 
 
