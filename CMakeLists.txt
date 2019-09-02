@@ -13,6 +13,7 @@ message(STATUS "${CMAKE_MODULE_PATH}")
 message(STATUS "Version: ${PROP_VERSION}")
 
 add_library(${PROP_TARGET} STATIC "")
+target_compile_features(${PROP_TARGET} PUBLIC cxx_std_17)
 target_include_directories(${PROP_TARGET} PUBLIC include)
 target_link_libraries(${PROP_TARGET} PRIVATE yaml-cpp)
 

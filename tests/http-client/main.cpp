@@ -13,7 +13,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <yaml-cpp/yaml.h>
-#include <conio.h>
+//#include <conio.h>
 #include <chrono>
 #include "rang.hpp"
 
@@ -226,7 +226,7 @@ int main()
     int key = _getch();
     system("cls");
 #else
-    int key = getch();
+      int key = 1;//getch();
     system("clear");
 #endif
 

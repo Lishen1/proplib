@@ -17,25 +17,23 @@
 
 namespace proplib
 {
+
+    
   template <class T>
   struct clear_type
   {
-    typedef T type;
+    typedef  T type;
     typedef const T const_type;
   };
 
   template <class T>
-  struct clear_type<T*>
+  struct clear_type<T*> : clear_type<T>
   {
-    typedef T type;
-    typedef const T const_type;
   };
 
   template <class T>
-  struct clear_type<T&>
+  struct clear_type<T&> : clear_type<T>
   {
-    typedef T type;
-    typedef const T const_type;
   };
 
   //-------------------
@@ -60,7 +58,12 @@ namespace proplib
     typedef T type;
     typedef const T const_type;
   };
-
+    
+    template< class T >
+    using clear_type_t = typename clear_type<T>::type;
+    
+    template< class T >
+    using clear_const_type_t = typename clear_type<T>::const_type;
   //-------------------
 
   template <typename T>
@@ -82,12 +85,12 @@ namespace proplib
   };
 
   template <class T>
-  constexpr std::string type_name();
+  const std::string type_name();
 
   inline std::string std_vector_typename(...) { return std::string("is_not_vector_type"); }
 
   template <class T>
-  constexpr std::string std_vector_typename(std::vector<T> v)
+  const std::string std_vector_typename(std::vector<T> v)
   {
     return type_name<T>();
   }
@@ -95,7 +98,7 @@ namespace proplib
   inline std::string std_map_typename(...) { return std::string("is_not_map_type"); }
 
   template <class T, class V>
-  constexpr std::string std_map_typename(std::map<T, V> v)
+  const std::string std_map_typename(std::map<T, V> v)
   {
     std::string key = type_name<T>();
     std::string val = type_name<V>();
@@ -103,7 +106,7 @@ namespace proplib
   }
 
   template <class T>
-  constexpr std::string type_name()
+  const std::string type_name()
   {
     std::string name = "unknown";
 
@@ -135,9 +138,9 @@ namespace proplib
     else if (std::is_same<T, std::string>::value)
       name = "string";
     else if (is_vector<T>::value)
-      name = "vector:" + std_vector_typename(T());
+      name = "vector:";// + std_vector_typename(T());
     else if (is_map<T>::value)
-      name = "map:" + std_map_typename(T());
+      name = "map:"; // + std_map_typename(T());
 
     return name;
   }

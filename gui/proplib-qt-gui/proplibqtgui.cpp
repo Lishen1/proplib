@@ -52,7 +52,7 @@ class Iui_tree_elem
     _childs.clear();
   }
   QtnPropertySet*      get_prop_set() { return _prop_set; }
-  virtual ui_build_res set_node(YAML::Node& n)
+  virtual ui_build_res set_node(YAML::Node n)
   {
     _node = n;
     return set_val();
@@ -84,7 +84,7 @@ class Iui_tree_elem
   protected:
   virtual ui_build_res set_val() = 0;
 
-  protected:
+  public:
   YAML::Node                          _node;
   YAML::detail::iterator_value        _node_iter;
   Iui_tree_elem*                      _parent   = nullptr;
@@ -183,9 +183,10 @@ class Ui_num_tree_elem : public Ui_tree_elem<T>
   {
     try
     {
-      std::string tag        = _node.Tag();
-      _node.as<YAML::Node>() = ((Ui_tree_elem<T>::Prop_type*)changedProperty)->value();
-      _node.SetTag(tag);
+      std::string tag        = this->_node.Tag();
+      auto prop_type_v = ( typename Ui_tree_elem<T>::Prop_type* ) changedProperty;
+      this->_node.template as<YAML::Node>() = prop_type_v->value();
+      this->_node.SetTag(tag);
     }
     catch (std::exception& e)
     {
@@ -196,8 +197,8 @@ class Ui_num_tree_elem : public Ui_tree_elem<T>
   {
     try
     {
-      auto v = _node.as<V>();
-      _prop->setValue(v);
+      auto v = this->_node.template as<V>();
+      this->_prop->setValue(v);
     }
     catch (std::exception& e)
     {
@@ -306,7 +307,8 @@ class Ui_vec_tree_elem : public Iui_tree_elem
         continue;
       if (child != _childs.end())
       {
-        (*child)->set_node(nod.as<YAML::Node>());
+          (*child)->set_node(nod.as<YAML::Node>());
+//        (*child)->set_node(nod.as<YAML::Node>());
         child++;
       }
     }
@@ -392,16 +394,16 @@ class Ui_serial_tree_elem : public Iui_tree_elem
 template <typename T>
 ui_build_res create_numeric_property(YAML::Node& ch, const QString& name, Iui_tree_elem* prnt, const QString& doc_string)
 {
-  typedef std::conditional<std::is_same<T, float>::value, QtnPropertyFloat, void>::type A;
-  typedef std::conditional<std::is_same<T, double>::value, QtnPropertyDouble, A>::type  B;
-  typedef std::conditional<std::is_same<T, uint8_t>::value, QtnPropertyUInt, B>::type   C;
-  typedef std::conditional<std::is_same<T, uint16_t>::value, QtnPropertyUInt, C>::type  D;
-  typedef std::conditional<std::is_same<T, uint32_t>::value, QtnPropertyUInt, D>::type  E;
-  typedef std::conditional<std::is_same<T, uint64_t>::value, QtnPropertyUInt, E>::type  F;
-  typedef std::conditional<std::is_same<T, int8_t>::value, QtnPropertyInt, F>::type     G;
-  typedef std::conditional<std::is_same<T, int16_t>::value, QtnPropertyInt, G>::type    J;
-  typedef std::conditional<std::is_same<T, int32_t>::value, QtnPropertyInt, J>::type    K;
-  typedef std::conditional<std::is_same<T, int64_t>::value, QtnPropertyInt, K>::type    M;
+  typedef typename std::conditional<std::is_same<T, float>::value, QtnPropertyFloat, void>::type A;
+  typedef typename std::conditional<std::is_same<T, double>::value, QtnPropertyDouble, A>::type  B;
+  typedef typename std::conditional<std::is_same<T, uint8_t>::value, QtnPropertyUInt, B>::type   C;
+  typedef typename std::conditional<std::is_same<T, uint16_t>::value, QtnPropertyUInt, C>::type  D;
+  typedef typename std::conditional<std::is_same<T, uint32_t>::value, QtnPropertyUInt, D>::type  E;
+  typedef typename std::conditional<std::is_same<T, uint64_t>::value, QtnPropertyUInt, E>::type  F;
+  typedef typename std::conditional<std::is_same<T, int8_t>::value, QtnPropertyInt, F>::type     G;
+  typedef typename std::conditional<std::is_same<T, int16_t>::value, QtnPropertyInt, G>::type    J;
+  typedef typename std::conditional<std::is_same<T, int32_t>::value, QtnPropertyInt, J>::type    K;
+  typedef typename std::conditional<std::is_same<T, int64_t>::value, QtnPropertyInt, K>::type    M;
 
   try
   {

@@ -11,13 +11,13 @@ namespace proplib
   template <class T>
   Container<T>* try_cast(IContainer* icont)
   {
-    return dynamic_cast<Container<clear_type<T>::type>*>(icont);
+    return dynamic_cast<Container<clear_type_t<T>>*>(icont);
   }
 
   template <class T>
   Container<T>* try_const_cast(IContainer* icont)
   {
-    return dynamic_cast<Container<clear_type<T>::const_type>*>(icont);
+    return dynamic_cast<Container<clear_const_type_t<T>>*>(icont);
   }
 
   template <class Ser, class T>

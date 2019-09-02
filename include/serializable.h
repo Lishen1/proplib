@@ -1,12 +1,5 @@
 #pragma once
-/*!
- * \file serializable.h
- *
- * \author Пантелюк П.А
- * \date Март 2018
- *
- *
- */
+
 
 #include "config.h"
 #include "tools.h"
@@ -82,7 +75,7 @@ namespace proplib
       if (_subs_deser_func)
         _subs_deser_func();
 
-      Container<clear_type<T>::type> container(cont);
+      Container<clear_type_t<T>> container(cont);
       for (auto& lv_ser : _serializers)
         if (lv_ser.second.serializer(lv_ser.first, &container) != res_t::ok)
         {

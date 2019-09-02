@@ -171,7 +171,7 @@ private:
   SERIALIZE_SUBS();
 };
 
-void main()
+int main()
 {
   el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
 
