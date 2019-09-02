@@ -3,6 +3,10 @@
 #include "QFile"
 #include "QTextStream"
 
+#ifdef _WIN32
+#pragma comment( lib, "Ws2_32" )
+#endif
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

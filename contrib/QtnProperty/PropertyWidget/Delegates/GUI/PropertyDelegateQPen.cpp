@@ -19,8 +19,6 @@
 #include "../PropertyDelegateFactory.h"
 #include "../Utils/PropertyEditorHandler.h"
 #include "../Utils/PropertyEditorAux.h"
-#include <QtnProperty/Core/Core/PropertyEnum.h>
-
 
 #include <QComboBox>
 #include <QStyledItemDelegate>
@@ -29,6 +27,7 @@
 #include <Core/PropertyInt.h>
 
 #include <GUI/PropertyQColor.h>
+#include "Core/PropertyEnum.h"
 
 void regQPenStyleDelegates(QtnPropertyDelegateFactory &factory)
 {

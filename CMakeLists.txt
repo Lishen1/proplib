@@ -3,6 +3,7 @@ project(proplib)
 
 option(BUILD_TOOLS "Build tools" TRUE)
 option(BUILD_TEST "Build Test Folder" TRUE)
+option(BUILD_GUI "Build GUI frontend" TRUE)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
@@ -44,6 +45,16 @@ if(BUILD_TOOLS)
   #set(MODULES stl_extra)
 endif()
 
+if(BUILD_GUI)
+  add_subdirectory(gui)
+  #add_library(test_module MODULE src/test_module.cpp)
+  #target_link_libraries(test_module ${LIBS})
+  #
+  #add_library(stl_extra MODULE src/stl_extra.cpp)
+  #target_link_libraries(stl_extra ${LIBS})
+  #
+  #set(MODULES stl_extra)
+endif()
 
 #cmake_minimum_required(VERSION 2.8)
 #

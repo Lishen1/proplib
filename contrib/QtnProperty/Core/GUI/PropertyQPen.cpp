@@ -15,8 +15,8 @@
 */
 
 #include "PropertyQPen.h"
-#include <QtnProperty/Core/GUI/PropertyQColor.h>
 #include <QMap>
+#include "PropertyQColor.h"
 
 static QMap<QString, Qt::PenStyle> CreateStr2PenStyle()
 {

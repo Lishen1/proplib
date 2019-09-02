@@ -17,7 +17,7 @@
 #include "PropertyDelegateAux.h"
 #include "PropertyView.h"
 #include <QMouseEvent>
-#include <QtWidgets/QToolTip>
+#include "QToolTip"
 
 QtnSubItem::QtnSubItem(const QRect &rect)
     : rect(rect),
@@ -32,8 +32,7 @@ void QtnSubItem::setTextAsTooltip(const QString& text)
     tooltipHandler = [text](QtnEventContext&, const QtnSubItem&)->QString {
         return text;
     };
-}   
-
+}
 
 void QtnSubItem::setPropertyNameAsTooltip(const QtnPropertyBase& property)
 {

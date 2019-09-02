@@ -82,4 +82,24 @@ private:
     QStringList m_items;
 };
 
+using QtnGetCandidatesFn = std::function<QStringList()>;
+using QtnCreateCandidateFn = std::function<QString(QWidget*, QString)>;
+Q_DECLARE_METATYPE(QtnGetCandidatesFn);
+Q_DECLARE_METATYPE(QtnCreateCandidateFn);
+
+class QTN_PW_EXPORT QtnPropertyDelegateQStringCallback: public QtnPropertyDelegateQString
+{
+    Q_DISABLE_COPY(QtnPropertyDelegateQStringCallback)
+
+public:
+    QtnPropertyDelegateQStringCallback(QtnPropertyQStringBase& owner);
+
+protected:
+    void applyAttributesImpl(const QtnPropertyDelegateAttributes& attributes) override;
+    QWidget* createValueEditorImpl(QWidget* parent, const QRect& rect, QtnInplaceInfo* inplaceInfo = nullptr) override;
+
+private:
+    QtnPropertyDelegateAttributes m_editorAttributes;
+};
+
 #endif // PROPERTY_DELEGATE_QSTRING_H

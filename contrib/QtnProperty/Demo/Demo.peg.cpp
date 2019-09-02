@@ -37,12 +37,12 @@ const QtnEnumInfo& FLAGS::info()
 
 QtnPropertySetSubPropertySetType::QtnPropertySetSubPropertySetType(QObject* parent)
     : QtnPropertySet(parent)
-    , SwitchProperty(*new QtnPropertyBool(this))
-    , ReadOnlyString(*new QtnPropertyQStringCallback(this))
-    , FileNameProperty(*new QtnPropertyQString(this))
-    , FolderNameProperty(*new QtnPropertyQString(this))
-    , StringFromList(*new QtnPropertyQString(this))
-    , CircleShapeColor(*new QtnPropertyQColor(this))
+    , SwitchProperty(*qtnCreateProperty<QtnPropertyBool>(this))
+    , ReadOnlyString(*qtnCreateProperty<QtnPropertyQStringCallback>(this))
+    , FileNameProperty(*qtnCreateProperty<QtnPropertyQString>(this))
+    , FolderNameProperty(*qtnCreateProperty<QtnPropertyQString>(this))
+    , StringFromList(*qtnCreateProperty<QtnPropertyQString>(this))
+    , CircleShapeColor(*qtnCreateProperty<QtnPropertyQColor>(this))
 {
     init();
     connectSlots();
@@ -216,37 +216,38 @@ void QtnPropertySetSubPropertySetType::connectDelegates()
 
 QtnPropertySetSamplePS::QtnPropertySetSamplePS(QObject* parent)
     : QtnPropertySet(parent)
-    , BoolProperty(*new QtnPropertyBool(this))
-    , ButtonProperty(*new QtnPropertyButton(this))
-    , ButtonLinkProperty(*new QtnPropertyButton(this))
-    , RGBColor(*new QtnPropertyABColor(this))
-    , ColorSolidDelegate(*new QtnPropertyQColor(this))
-    , FloatPropertySliderBox(*new QtnPropertyFloat(this))
-    , DoubleProperty(*new QtnPropertyDouble(this))
-    , FloatProperty(*new QtnPropertyFloat(this))
-    , IntProperty(*new QtnPropertyInt(this))
-    , IntPropertyComboBox(*new QtnPropertyInt(this))
-    , UIntProperty(*new QtnPropertyUInt(this))
-    , EnumProperty(*new QtnPropertyEnum(this))
-    , EnumFlagsProperty(*new QtnPropertyEnumFlags(this))
-    , QStringValue(*new QtnPropertyQString(this))
-    , EnableSubPropertySet(*new QtnPropertyBool(this))
-    , SubPropertySet(*new QtnPropertySetSubPropertySetType(this))
-    , QPointProperty(*new QtnPropertyQPoint(this))
-    , QSizeProperty(*new QtnPropertyQSize(this))
-    , QRectProperty(*new QtnPropertyQRect(this))
-    , QPointFProperty(*new QtnPropertyQPointF(this))
-    , QSizeFProperty(*new QtnPropertyQSizeF(this))
-    , QRectFProperty(*new QtnPropertyQRectF(this))
-    , QColorProperty(*new QtnPropertyQColor(this))
-    , QFontProperty(*new QtnPropertyQFont(this))
-    , FreqProperty(*new QtnPropertyFreq(this))
-    , LayerProperty(*new QtnPropertyLayer(this))
-    , BrushStyleProperty(*new QtnPropertyQBrushStyle(this))
-    , PenWidthProperty(*new QtnPropertyPenWidth(this))
-    , PenStyleProperty(*new QtnPropertyQPenStyle(this))
-    , PenProperty(*new QtnPropertyQPen(this))
-    , SubPropertySet2(*new QtnPropertySetSubPropertySetType(this))
+    , BoolProperty(*qtnCreateProperty<QtnPropertyBool>(this))
+    , ButtonProperty(*qtnCreateProperty<QtnPropertyButton>(this))
+    , ButtonLinkProperty(*qtnCreateProperty<QtnPropertyButton>(this))
+    , RGBColor(*qtnCreateProperty<QtnPropertyABColor>(this))
+    , ColorSolidDelegate(*qtnCreateProperty<QtnPropertyQColor>(this))
+    , FloatPropertySliderBox(*qtnCreateProperty<QtnPropertyFloat>(this))
+    , DoubleProperty(*qtnCreateProperty<QtnPropertyDouble>(this))
+    , FloatProperty(*qtnCreateProperty<QtnPropertyFloat>(this))
+    , IntProperty(*qtnCreateProperty<QtnPropertyInt>(this))
+    , IntPropertyComboBox(*qtnCreateProperty<QtnPropertyInt>(this))
+    , UIntProperty(*qtnCreateProperty<QtnPropertyUInt>(this))
+    , EnumProperty(*qtnCreateProperty<QtnPropertyEnum>(this))
+    , EnumFlagsProperty(*qtnCreateProperty<QtnPropertyEnumFlags>(this))
+    , QStringValue(*qtnCreateProperty<QtnPropertyQString>(this))
+    , EnableSubPropertySet(*qtnCreateProperty<QtnPropertyBool>(this))
+    , SubPropertySet(*qtnCreateProperty<QtnPropertySetSubPropertySetType>(this))
+    , QPointProperty(*qtnCreateProperty<QtnPropertyQPoint>(this))
+    , QSizeProperty(*qtnCreateProperty<QtnPropertyQSize>(this))
+    , QRectProperty(*qtnCreateProperty<QtnPropertyQRect>(this))
+    , QPointFProperty(*qtnCreateProperty<QtnPropertyQPointF>(this))
+    , QSizeFProperty(*qtnCreateProperty<QtnPropertyQSizeF>(this))
+    , QRectFProperty(*qtnCreateProperty<QtnPropertyQRectF>(this))
+    , QColorProperty(*qtnCreateProperty<QtnPropertyQColor>(this))
+    , QFontProperty(*qtnCreateProperty<QtnPropertyQFont>(this))
+    , FreqProperty(*qtnCreateProperty<QtnPropertyFreq>(this))
+    , LayerProperty(*qtnCreateProperty<QtnPropertyLayer>(this))
+    , BrushStyleProperty(*qtnCreateProperty<QtnPropertyQBrushStyle>(this))
+    , PenWidthProperty(*qtnCreateProperty<QtnPropertyPenWidth>(this))
+    , PenStyleProperty(*qtnCreateProperty<QtnPropertyQPenStyle>(this))
+    , PenProperty(*qtnCreateProperty<QtnPropertyQPen>(this))
+    , QStringCallbackProperty(*qtnCreateProperty<QtnPropertyQString>(this))
+    , SubPropertySet2(*qtnCreateProperty<QtnPropertySetSubPropertySetType>(this))
 {
     init();
     connectSlots();
@@ -292,6 +293,7 @@ QtnPropertySetSamplePS& QtnPropertySetSamplePS::operator=(const QtnPropertySetSa
     PenWidthProperty = other.PenWidthProperty;
     PenStyleProperty = other.PenStyleProperty;
     PenProperty = other.PenProperty;
+    QStringCallbackProperty = other.QStringCallbackProperty;
     SubPropertySet2 = other.SubPropertySet2;
 
     return *this;
@@ -462,6 +464,11 @@ bool QtnPropertySetSamplePS::copyValuesImpl(QtnPropertySet* propertySetCopyFrom,
     if (!(theCopyFrom->PenProperty.state() & ignoreMask))
     {
         PenProperty = theCopyFrom->PenProperty;
+    }
+
+    if (!(theCopyFrom->QStringCallbackProperty.state() & ignoreMask))
+    {
+        QStringCallbackProperty = theCopyFrom->QStringCallbackProperty;
     }
 
     SubPropertySet2.copyValues(&theCopyFrom->SubPropertySet2, ignoreMask);
@@ -650,6 +657,10 @@ void QtnPropertySetSamplePS::init()
     PenProperty.setName(PenProperty_name);
     static QString PenProperty_description = "Property to hold QPen values.";
     PenProperty.setDescription(PenProperty_description);
+    static QString QStringCallbackProperty_name = tr("QStringCallbackProperty");
+    QStringCallbackProperty.setName(QStringCallbackProperty_name);
+    static QString QStringCallbackProperty_description = "Property to hold QString values with candidates.";
+    QStringCallbackProperty.setDescription(QStringCallbackProperty_description);
     static QString SubPropertySet2_name = tr("SubPropertySet2");
     SubPropertySet2.setName(SubPropertySet2_name);
     SubPropertySet2.setState(QtnPropertyStateCollapsed);

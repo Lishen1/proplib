@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
   proplibqtgui w;
 
-  YAML::Node n = YAML::LoadFile("test.yml");
+  YAML::Node n = YAML::LoadFile(R"(D:\User_data\VC_PROJECTS\proplib\tests\prop-serialize\test.yml)");
   QElapsedTimer timer;
   timer.start();
   w.build_gui(n);

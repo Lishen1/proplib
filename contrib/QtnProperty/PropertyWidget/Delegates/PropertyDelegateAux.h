@@ -25,10 +25,9 @@
 #include <QEvent>
 
 class QtnPropertyView;
+class QtnPropertyBase;
 struct QtnDrawContext;
 struct QtnEventContext;
-
-class QtnPropertyBase;
 
 class QtnSubItemEvent: public QEvent
 {

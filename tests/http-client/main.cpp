@@ -17,6 +17,9 @@
 #include <chrono>
 #include "rang.hpp"
 
+#ifdef _WIN32
+#pragma comment( lib, "Ws2_32" )
+#endif
 
 INITIALIZE_EASYLOGGINGPP
 
