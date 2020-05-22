@@ -15,7 +15,7 @@
 #include <typeinfo>
 
 #include <cstdlib>
-
+#include <cmath>
 
 INITIALIZE_EASYLOGGINGPP
 
