@@ -1,9 +1,10 @@
 #include <editor/proplibqteditor.h>
 #include <editor/proplibqteditor.h>
-#include <editor/httplib.h>
 #include <editor/yaml_highlighter.h>
 
 #include <gui/proplibqtgui.h>
+
+#include <httplib.h>
 
 #include <QElapsedTimer>
 #include <QFileDialog>

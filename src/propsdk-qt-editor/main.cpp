@@ -1,4 +1,4 @@
-#include <editor/httplib.h>
+#include <httplib.h>
 #include <editor/proplibqteditor.h>
 
 #include <QtWidgets/QApplication>

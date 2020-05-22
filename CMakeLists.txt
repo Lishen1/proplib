@@ -45,13 +45,21 @@ CPMAddPackage(
   #  "YAML_CPP_BUILD_CONTRIB Off"
   #  "YAML_CPP_BUILD_TOOLS Off"
 )
+
+CPMAddPackage(
+  NAME httplib
+  GITHUB_REPOSITORY yhirose/cpp-httplib
+  GIT_TAG master
+)
+
+
 add_library( propsdk INTERFACE )
 
 # easyloggingpp headers bug manually add
 target_include_directories( propsdk INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/_deps/easyloggingpp-src/src )
 
 
-target_link_libraries( propsdk INTERFACE propsdk-cppfeatures propsdk-cppwarnings easyloggingpp yaml-cpp QtnProperty)
+target_link_libraries( propsdk INTERFACE propsdk-cppfeatures propsdk-cppwarnings easyloggingpp yaml-cpp QtnProperty httplib)
 
 message( STATUS "Enabled examples: ${EXAMPLES_ENABLED}" )
 message( STATUS "Enabled    tests: ${TESTS_ENABLED}" )
