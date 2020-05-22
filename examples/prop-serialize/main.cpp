@@ -1,5 +1,5 @@
-#include <prop/serialize/serializable.h>
-#include <prop/serialize/serialize.h>
+#include <serialize/serializable.h>
+#include <serialize/serialize.h>
 
 #include <easylogging++.h>
 
