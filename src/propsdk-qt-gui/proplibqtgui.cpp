@@ -185,10 +185,10 @@ class Ui_num_tree_elem : public Ui_tree_elem<T>
   {
     try
     {
-      std::string tag        = Ui_pair_elem::_node.Tag();
+      std::string tag        = Iui_tree_elem::_node.Tag();
       auto prop_type = (T*)(changedProperty);
-      Ui_pair_elem::_node.as<YAML::Node>() = prop_type->value();
-      Ui_pair_elem::_node.SetTag(tag);
+      Iui_tree_elem::_node.as<YAML::Node>() = prop_type->value();
+      Iui_tree_elem::_node.SetTag(tag);
     }
     catch (std::exception& e)
     {
@@ -199,7 +199,7 @@ class Ui_num_tree_elem : public Ui_tree_elem<T>
   {
     try
     {
-      auto v = Ui_pair_elem::_node.as<V>();
+      auto v = Iui_tree_elem::_node.as<V>();
       this->_prop->setValue(v);
     }
     catch (std::exception& e)

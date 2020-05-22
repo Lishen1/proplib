@@ -16,7 +16,16 @@ add_executable ( qt-editor
 )
 
 
+
+
 add_subdirectory(include)
 target_include_directories ( qt-editor PRIVATE include)
 target_link_libraries( qt-editor PRIVATE propsdk qt-gui-module Qt5::Widgets Qt5::Gui Qt5::Script)
+
+
+
+if (UNIX)
+  target_link_libraries( qt-editor PRIVATE pthread )
+endif()
+
 
