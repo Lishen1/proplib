@@ -17,6 +17,7 @@ target_include_directories( propsdk-cppfeatures INTERFACE include )
 
 include( cmake/dependency.cmake )
 
+
 add_library( propsdk INTERFACE )
 
 set_dependency ( propsdk-cppfeatures INTERFACE)
