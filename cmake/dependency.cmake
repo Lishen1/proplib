@@ -34,13 +34,13 @@ if ( QT_EDITOR_ENABLED )
 else()
 
   CPMAddPackage(
-    NAME imgui-sfml
-    GITHUB_REPOSITORY ueberaccelerate/imgui-sfml
+    NAME imgui
+    GITHUB_REPOSITORY ueberaccelerate/imgui
     GIT_TAG master
     OPTIONS 
-    "IMGUI_SFML_BUILD_EXAMPLES OFF"
+    "IMGUI_BUILD_EXAMPLES OFF"
   )
-  set ( TARGET_EDITOR ImGui-SFML::ImGui-SFML)
+  set ( TARGET_EDITOR imgui )
 endif()
 
 function (set_dependency target_name target_type ) 
