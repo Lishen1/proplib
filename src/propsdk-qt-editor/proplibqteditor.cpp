@@ -1,5 +1,4 @@
 #include <editor/proplibqteditor.h>
-#include <editor/proplibqteditor.h>
 #include <editor/yaml_highlighter.h>
 
 #include <gui/proplibqtgui.h>
