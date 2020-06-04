@@ -20,6 +20,10 @@
 #include <string_view>
 
 namespace editor {
+    class WindowView {
+    };
+
+    using WindowViewPtr = std::shared_ptr < WindowView >;
     class EditorWindow {
 public:
         EditorWindow();
@@ -27,9 +31,12 @@ public:
         EditorWindow &operator = (const EditorWindow&) = delete;
         ~EditorWindow();
 
+        WindowViewPtr main;
+
+//        void addSubView(WindowViewPtr);
         [[nodiscard]] int setup_window();
         [[nodiscard]] int loop();
-        
+
         [[nodiscard]] int error_code() const noexcept;
 
 private:

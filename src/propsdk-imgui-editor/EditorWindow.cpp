@@ -76,7 +76,7 @@ struct Test {
 [[nodiscard]] int EditorWindow::loop()
 {
     auto window = window_.get();
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         // Poll and handle events (inputs, window resize, etc.)
@@ -89,8 +89,32 @@ struct Test {
         // Recive new frame
         new_frame();
 
-        ImGui::ShowDemoWindow();
+//        ImGui::ShowDemoWindow();
+        ImGui::SetNextWindowPos(ImVec2(50, 20), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(550, 340), ImGuiCond_FirstUseEver);
+
+        // Main body of the Demo window starts here.
+        ImGui::Begin("Property");
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::End();
         
+        ImGui::SetNextWindowPos(ImVec2(50, 380), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(550, 200), ImGuiCond_FirstUseEver);
+
+        // Main body of the Demo window starts here.
+        ImGui::Begin("Detail")ж
+        
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::End();
+        
+        ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(550, 560), ImGuiCond_FirstUseEver);
+
+        // Main body of the Demo window starts here.
+        ImGui::Begin("Console")ж
+        
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::End();
         // Rendering
         ImGui::Render();
         int display_w, display_h;
