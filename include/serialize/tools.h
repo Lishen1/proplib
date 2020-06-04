@@ -88,31 +88,32 @@ namespace proplib
   };
 
   template <class T>
-  constexpr std::string_view type_name();
+  std::string type_name();
 
-//  template< typename ...Args>
-//  std::string_view std_vector_typename([[maybe_unused]] Args ...args) { return std::string_view("is_not_vector_type"); }
-//
-//  template <class T>
-//  constexpr std::string_view std_vector_typename( [[maybe_unused]] std::vector<T> v)
-//  {
-//    return type_name<typename std::vector<T>::value_type>();
-//  }
-//
-//  //inline std::string std_map_typename(...) { return std::string("is_not_map_type"); }
-//
-//  template <class T, class V>
-//  constexpr std::string_view std_map_typename( [[maybe_unused]] std::map<T, V> v)
-//  {
-//    auto key = type_name<T>();
-//    auto val = type_name<V>();
-//    return key + std::string(":") + val;
-//  }
+  template< typename ...Args>
+  std::string std_vector_typename([[maybe_unused]] Args ...args) { return std::string("is_not_vector_type"); }
 
   template <class T>
-  constexpr std::string_view type_name()
+  std::string std_vector_typename( [[maybe_unused]] std::vector<T> v)
   {
-    std::string_view name = "unknown";
+    return type_name<typename std::vector<T>::value_type>();
+  }
+
+
+  template <class T, class V>
+  std::string std_map_typename( [[maybe_unused]] std::map<T, V> v)
+  {
+    auto key = type_name<T>();
+    auto val = type_name<V>();
+    return key + std::string(":") + val;
+  }
+  template<typename ...Args>
+  inline std::string std_map_typename(Args ...args) { return std::string("is_not_map_type"); }
+
+  template <class T>
+  std::string type_name()
+  {
+    std::string name = "unknown";
 
     if (std::is_arithmetic<T>::value)
     {
@@ -143,10 +144,10 @@ namespace proplib
       name = "string";
     }
     else if (is_vector<T>::value) {
-      name = "vector"; //std_vector_typename(std::declval<T>());
+        name = "vector:" + std_vector_typename(T{});
     }
     else if (is_map<T>::value) {
-      name = "map";// + std_map_typename(std::declval<T>());
+        name = "map:" + std_map_typename(T{});
     }
 
     return name;
