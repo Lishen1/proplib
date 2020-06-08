@@ -7,7 +7,23 @@
 
 #include <editor/EditorWindow.hpp>
 
+#include <iostream>
+
+#include <yaml-cpp/yaml.h>
+
 namespace editor {
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
 
 EditorWindow::EditorWindow() :
     window_destroyer_ {[](GLFWwindow *window) {
@@ -77,6 +93,19 @@ struct Test {
 {
     auto window = window_.get();
     ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+
+    YAML::Node root;
+
+    root["test3"]     = "";
+    root["test3_doc"] = "Simple Test class with scalar and basic sequnece";
+
+    root["test3"].SetTag("!serialize!");
+    root["test3_doc"].SetTag("!doc!");
+
+
+    std::cout << root << "\n";
+
+    int age_prop{ 77 };
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         // Poll and handle events (inputs, window resize, etc.)
@@ -94,15 +123,24 @@ struct Test {
         ImGui::SetNextWindowSize(ImVec2(550, 340), ImGuiCond_FirstUseEver);
 
         // Main body of the Demo window starts here.
-        ImGui::Begin("Property");
-        // Early out if the window is collapsed, as an optimization.
+        ImGui::Begin("Property - Simple Test class with scalar and basic sequnece");
+        ImGui::InputInt("age", &age_prop); ImGui::SameLine();
+        HelpMarker("age of test");
+        if (ImGui::CollapsingHeader("childs"))
+        {
+
+        }
+        ImGui::SameLine(); HelpMarker("names vector");
+        //ImGui::ShowDemoWindow();
+
+
         ImGui::End();
         
         ImGui::SetNextWindowPos(ImVec2(50, 380), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(550, 200), ImGuiCond_FirstUseEver);
 
         // Main body of the Demo window starts here.
-        ImGui::Begin("Detail")ж
+        ImGui::Begin("Detail");
         
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
@@ -111,7 +149,7 @@ struct Test {
         ImGui::SetNextWindowSize(ImVec2(550, 560), ImGuiCond_FirstUseEver);
 
         // Main body of the Demo window starts here.
-        ImGui::Begin("Console")ж
+        ImGui::Begin("Console");
         
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();

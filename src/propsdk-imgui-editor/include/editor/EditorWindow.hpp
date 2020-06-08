@@ -18,44 +18,46 @@
 #include <GLFW/glfw3.h>
 
 #include <string_view>
+#include <memory>
+#include <functional>
 
 namespace editor {
-    class WindowView {
-    };
+	class WindowView {
+	};
 
-    using WindowViewPtr = std::shared_ptr < WindowView >;
-    class EditorWindow {
-public:
-        EditorWindow();
-        EditorWindow(const EditorWindow&) = delete;
-        EditorWindow &operator = (const EditorWindow&) = delete;
-        ~EditorWindow();
+	using WindowViewPtr = std::shared_ptr < WindowView >;
+	class EditorWindow {
+	public:
+		EditorWindow();
+		EditorWindow(const EditorWindow&) = delete;
+		EditorWindow& operator = (const EditorWindow&) = delete;
+		~EditorWindow();
 
-        WindowViewPtr main;
+		WindowViewPtr main;
 
-//        void addSubView(WindowViewPtr);
-        [[nodiscard]] int setup_window();
-        [[nodiscard]] int loop();
+		//        void addSubView(WindowViewPtr);
+		[[nodiscard]] int setup_window();
+		[[nodiscard]] int loop();
 
-        [[nodiscard]] int error_code() const noexcept;
+		[[nodiscard]] int error_code() const noexcept;
 
-private:
-        enum class ErrorCode: int {
-            NoError = 0,
-            WindowSetupError = -1
-        };
+	private:
+		enum class ErrorCode : int {
+			NoError = 0,
+			WindowSetupError = -1
+		};
 
-private:
-        [[nodiscard]] int cast_error_code(const ErrorCode code) const noexcept;
-        static void glfw_error_callback(int error, const char *description);
-        std::string_view set_glsl_glfw();
-        void new_frame();
+	private:
+		[[nodiscard]] int cast_error_code(const ErrorCode code) const noexcept;
+		static void glfw_error_callback(int error, const char* description);
+		std::string_view set_glsl_glfw();
+		void new_frame();
 
-private:
-        std::function < void(GLFWwindow * window) > window_destroyer_;
-        std::unique_ptr < GLFWwindow, std::function < void(GLFWwindow * window) >> window_;
-        ErrorCode error_code_;
-    };
+	private:
+		std::function < void(GLFWwindow* window) > window_destroyer_;
+		std::unique_ptr < GLFWwindow, std::function < void(GLFWwindow* window) >> window_;
+		ErrorCode error_code_;
+	};
 };
 
 #endif // EDITOR_EDITORWINDOW_HPP
