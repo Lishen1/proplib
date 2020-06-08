@@ -32,7 +32,7 @@ namespace proplib
                                 YAML::Emitter& node, ...)
     {
       node.SetSeqFormat(YAML::Flow);
-      std::string_view name = type_name<T>();
+      std::string name = type_name<T>();
       node << YAML::Key << key;
 
       if (scheme)
