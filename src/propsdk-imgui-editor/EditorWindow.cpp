@@ -99,6 +99,8 @@ struct YamlInfo {
         type_name = node->second.Tag();
         this->node = node->second;
         type = this->node.Type();
+        // we know after node data we put
+        // <DOC> node so we just increment it
         ++node;
         try {
             doc = node->second.as<std::string>();
@@ -241,10 +243,8 @@ auto is_float = [](std::string_view tname) {
 };
 
 struct SerializableGuiElement: GuiElement<void> {
-    
-    std::vector<YamlInfo*> elements;
-    
-    SerializableGuiElement (YAML::Node root) {
+    private:
+    void setup_gui(YAML::Node root) {
         for ( YAML::iterator iter = root.begin(); iter != root.end(); ++iter) {
             if ( iter->second.Tag() != "doc") {
                 const auto& real_gansta_type_name_fuk = iter->second.Tag();
@@ -257,30 +257,48 @@ struct SerializableGuiElement: GuiElement<void> {
             }
         }
     }
+    public:
     
-    SerializableGuiElement (YAML::iterator &node) {
-        
+    std::vector<YamlInfo*> elements;
+    
+    SerializableGuiElement (YAML::Node root)  {
+        setup_gui(root);
+    }
+    
+    SerializableGuiElement (YAML::iterator &node) : GuiElement(node) {
+        setup_gui(this->node);
     }
     
     void makeGui() override {
-        for (auto *el: elements) {
-            if ( is_integral(el->type_name)) {
-                auto *as_int = gui_cast<IntGuiElement>(el);
-                as_int->makeGui();
-            }
-            if ( is_float(el->type_name)) {
-                auto *as_int = gui_cast<FloatGuiElement>(el);
-                as_int->makeGui();
-            }
-            if ( el->type_name == "string" ) {
-                auto *as_int = gui_cast<StringGuiElement>(el);
-                as_int->makeGui();
-            }
-            if ( el->type_name == "bool" ) {
-                auto *as_int = gui_cast<BoolGuiElement>(el);
-                as_int->makeGui();
+        if (ImGui::CollapsingHeader(this->name.data()))
+        {
+            for (auto *el: elements) {
+                if ( is_integral(el->type_name)) {
+                    auto *as_void = gui_cast<IntGuiElement>(el);
+                    as_void->makeGui();
+                }
+                if ( is_float(el->type_name)) {
+                    auto *as_void = gui_cast<FloatGuiElement>(el);
+                    as_void->makeGui();
+                }
+                if ( el->type_name == "string" ) {
+                    auto *as_void = gui_cast<StringGuiElement>(el);
+                    as_void->makeGui();
+                }
+                if ( el->type_name == "bool" ) {
+                    auto *as_void = gui_cast<BoolGuiElement>(el);
+                    as_void->makeGui();
+                }
+                if ( el->type_name == "serializable" ) {
+                    auto *as_void = gui_cast<SerializableGuiElement>(el);
+                    as_void->makeGui();
+                }
             }
         }
+        
+        if(!this->doc.empty()) { ImGui::SameLine(); HelpMarker(this->doc.data()); }
+        
+        
         
 
     }
@@ -318,11 +336,6 @@ struct SerializableGuiElement: GuiElement<void> {
         
         serializableGui.makeGui();
 
-        if (ImGui::CollapsingHeader("childs"))
-        {
-
-        }
-        ImGui::SameLine(); HelpMarker("names vector");
         //ImGui::ShowDemoWindow();
 
 
