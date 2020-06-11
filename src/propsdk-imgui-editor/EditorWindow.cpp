@@ -10,6 +10,8 @@
 #include <iostream>
 
 #include <yaml-cpp/yaml.h>
+#include <algorithm>
+#include <vector>
 
 namespace editor {
 static void HelpMarker(const char* desc)
@@ -85,7 +87,6 @@ int EditorWindow::setup_window()
     ImGui_ImplOpenGL3_NewFrame();
     return cast_error_code(error_code_ = ErrorCode::NoError);
 }
-#include <vector>
 
 struct YamlInfo {
     std::string name;
