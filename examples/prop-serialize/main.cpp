@@ -212,7 +212,6 @@ int main()
 	ser_test.add_subprop(c1, "c1");
 	ser_test.add_subprop(c2, "c2");
 	ser_test.add_subprop(c3, "c3");
-
 	ser_test.set_logger(name);
 	ser_test.serialize(out, true);
 

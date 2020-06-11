@@ -85,26 +85,215 @@ int EditorWindow::setup_window()
     ImGui_ImplOpenGL3_NewFrame();
     return cast_error_code(error_code_ = ErrorCode::NoError);
 }
-struct Test {
-    int age;
+#include <vector>
+
+struct YamlInfo {
+    std::string name;
+    std::string type_name;
+    std::string doc;
+    YAML::NodeType::value type;
+    
+    YamlInfo() = default;
+    YamlInfo(YAML::iterator &node) {
+        name = node->first.as<std::string>();
+        type_name = node->second.Tag();
+        this->node = node->second;
+        type = this->node.Type();
+        ++node;
+        try {
+            doc = node->second.as<std::string>();
+        } catch (...) {
+            std::cout << "fuk";
+        }
+    }
+protected:
+    YAML::Node node;
+    
+    
+};
+
+template<typename T>
+struct GuiElement: YamlInfo {
+    using type_value = T;
+    using iterator = type_value*;
+    using const_iterator = const iterator;
+    
+    virtual void makeGui() {}
+    GuiElement() = default;
+    GuiElement(YAML::iterator &node) : YamlInfo(node) {}
+    virtual ~GuiElement() = default;
+    
+};
+
+
+struct StringGuiElement: GuiElement<std::string> {
+public:
+    std::string& get() {
+        return value;
+    }
+    void set(const std::string& new_value) {
+        node[name.data()] = value = new_value;
+    }
+    void makeGui() override {
+        std::array<char, 128> buffer{};
+        std::copy(value.begin(), value.end(), buffer.begin());
+        if (ImGui::InputText((name + " - " + type_name).data(), buffer.data(), buffer.size())){
+            value = buffer.data();
+        } ImGui::SameLine();
+        HelpMarker(doc.data());
+        
+    }
+    StringGuiElement(YAML::iterator &node) : GuiElement(node) {
+        try {
+            value = node->second.as<std::string>();
+        } catch (...) {
+            std::cout << "fuk";
+        }
+    }
+    ~StringGuiElement() override = default;
+private:
+    std::string value;
+};
+
+struct IntGuiElement: GuiElement<int> {
+    int& get() {
+        return value;
+    }
+    void set(const int new_value) {
+        node[name.data()] = value = new_value;
+    }
+    void makeGui() override {
+        ImGui::InputInt((name + " - " + type_name).data(), &value); ImGui::SameLine();
+        HelpMarker(doc.data());
+    }
+    IntGuiElement(YAML::iterator &node) : GuiElement(node) {
+        std::cout << node->second;
+        try {
+            value = this->node.as<int>();
+        } catch (...) {
+            std::cout << "fuk";
+        }
+    }
+    virtual ~IntGuiElement() override = default;
+private:
+    int value;
+};
+
+struct FloatGuiElement: GuiElement<double> {
+    double& get() {
+        return value;
+    }
+    void set(const int new_value) {
+        node[name.data()] = value = new_value;
+    }
+    void makeGui() override {
+        ImGui::InputDouble((name + " - " + type_name).data(), &value); ImGui::SameLine();
+        HelpMarker(doc.data());
+    }
+    FloatGuiElement(YAML::iterator &node) : GuiElement(node) {
+        try {
+            value = this->node.as<double>();
+        } catch (...) {
+            std::cout << "fuk";
+        }
+    }
+    virtual ~FloatGuiElement() override = default;
+private:
+    double value;
+};
+
+struct BoolGuiElement: GuiElement<bool> {
+    bool& get() {
+        return value;
+    }
+    void set(const int new_value) {
+        node[name.data()] = value = new_value;
+    }
+    void makeGui() override {
+        ImGui::Checkbox((name + " - " + type_name).data(), &value); ImGui::SameLine();
+        HelpMarker(doc.data());
+        this->node = true;
+    }
+    BoolGuiElement(YAML::iterator &node) : GuiElement(node) {
+        try {
+            value = this->node.as<bool>();
+        } catch (...) {
+            std::cout << "fuk";
+        }
+    }
+    virtual ~BoolGuiElement() override = default;
+private:
+    bool value;
+};
+
+template <typename T>
+T* gui_cast(YamlInfo *inherited) {
+    return static_cast<T*>(inherited);
+}
+
+auto is_integral = [](std::string_view tname) {
+    std::array types_name = { "int" };
+    return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
+};
+auto is_float = [](std::string_view tname) {
+    std::array types_name = { "float", "double" };
+    return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
+};
+
+struct SerializableGuiElement: GuiElement<void> {
+    
+    std::vector<YamlInfo*> elements;
+    
+    SerializableGuiElement (YAML::Node root) {
+        for ( YAML::iterator iter = root.begin(); iter != root.end(); ++iter) {
+            if ( iter->second.Tag() != "doc") {
+                const auto& real_gansta_type_name_fuk = iter->second.Tag();
+                std::cout << iter->first << " " << real_gansta_type_name_fuk << "\n";
+                if ( is_integral(real_gansta_type_name_fuk)) elements.push_back(new IntGuiElement(iter));
+                if ( is_float(real_gansta_type_name_fuk)) elements.push_back(new FloatGuiElement(iter));
+                if ( real_gansta_type_name_fuk == "string") elements.push_back(new StringGuiElement(iter));
+                if ( real_gansta_type_name_fuk == "bool") elements.push_back(new BoolGuiElement(iter));
+                if ( real_gansta_type_name_fuk == "serializable") elements.push_back(new SerializableGuiElement(iter));
+            }
+        }
+    }
+    
+    SerializableGuiElement (YAML::iterator &node) {
+        
+    }
+    
+    void makeGui() override {
+        for (auto *el: elements) {
+            if ( is_integral(el->type_name)) {
+                auto *as_int = gui_cast<IntGuiElement>(el);
+                as_int->makeGui();
+            }
+            if ( is_float(el->type_name)) {
+                auto *as_int = gui_cast<FloatGuiElement>(el);
+                as_int->makeGui();
+            }
+            if ( el->type_name == "string" ) {
+                auto *as_int = gui_cast<StringGuiElement>(el);
+                as_int->makeGui();
+            }
+            if ( el->type_name == "bool" ) {
+                auto *as_int = gui_cast<BoolGuiElement>(el);
+                as_int->makeGui();
+            }
+        }
+        
+
+    }
 };
 
 [[nodiscard]] int EditorWindow::loop()
 {
     auto window = window_.get();
     ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+    
+    auto serializableGui = SerializableGuiElement(YAML::LoadFile("test.yml"));
 
-    YAML::Node root;
-
-    root["test3"]     = "";
-    root["test3_doc"] = "Simple Test class with scalar and basic sequnece";
-
-    root["test3"].SetTag("!serialize!");
-    root["test3_doc"].SetTag("!doc!");
-
-
-    std::cout << root << "\n";
-
+    
     int age_prop{ 77 };
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -124,8 +313,11 @@ struct Test {
 
         // Main body of the Demo window starts here.
         ImGui::Begin("Property - Simple Test class with scalar and basic sequnece");
-        ImGui::InputInt("age", &age_prop); ImGui::SameLine();
-        HelpMarker("age of test");
+        
+
+        
+        serializableGui.makeGui();
+
         if (ImGui::CollapsingHeader("childs"))
         {
 
