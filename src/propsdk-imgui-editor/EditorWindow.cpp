@@ -100,14 +100,22 @@ struct YamlInfo {
         type_name = node->second.Tag();
         this->node = node->second;
         type = this->node.Type();
-        // we know after node data we put
-        // <DOC> node so we just increment it
-        ++node;
-        try {
-            doc = node->second.as<std::string>();
-        } catch (...) {
-            std::cout << "fuk";
+
+        YAML::iterator iter = node;
+        ++iter;
+        // Check we have doc tag
+        if (iter->second && iter->second.Tag() == "doc") {
+            // we know after node data we put
+            // <DOC> node so we just increment it
+            ++node;
+            try {
+                doc = node->second.as<std::string>();
+            }
+            catch (...) {
+                std::cout << "fuk";
+            }
         }
+        
     }
 protected:
     YAML::Node node;
@@ -213,11 +221,13 @@ struct BoolGuiElement: GuiElement<bool> {
         node[name.data()] = value = new_value;
     }
     void makeGui() override {
-        ImGui::Checkbox((name + " - " + type_name).data(), &value); ImGui::SameLine();
+        if (ImGui::Checkbox((name + " - " + type_name /*+ std::to_string(randHash)*/).data(), &value)) {
+            std::cout << value;
+        } ImGui::SameLine();
         HelpMarker(doc.data());
-        this->node = true;
     }
     BoolGuiElement(YAML::iterator &node) : GuiElement(node) {
+        randHash = rand();
         try {
             value = this->node.as<bool>();
         } catch (...) {
@@ -226,6 +236,7 @@ struct BoolGuiElement: GuiElement<bool> {
     }
     virtual ~BoolGuiElement() override = default;
 private:
+    int randHash;
     bool value;
 };
 
@@ -249,7 +260,6 @@ struct SerializableGuiElement: GuiElement<void> {
         for ( YAML::iterator iter = root.begin(); iter != root.end(); ++iter) {
             if ( iter->second.Tag() != "doc") {
                 const auto& real_gansta_type_name_fuk = iter->second.Tag();
-                std::cout << iter->first << " " << real_gansta_type_name_fuk << "\n";
                 if ( is_integral(real_gansta_type_name_fuk)) elements.push_back(new IntGuiElement(iter));
                 if ( is_float(real_gansta_type_name_fuk)) elements.push_back(new FloatGuiElement(iter));
                 if ( real_gansta_type_name_fuk == "string") elements.push_back(new StringGuiElement(iter));
@@ -259,7 +269,6 @@ struct SerializableGuiElement: GuiElement<void> {
         }
     }
     public:
-    
     std::vector<YamlInfo*> elements;
     
     SerializableGuiElement (YAML::Node root)  {
@@ -271,37 +280,51 @@ struct SerializableGuiElement: GuiElement<void> {
     }
     
     void makeGui() override {
-        if (ImGui::CollapsingHeader(this->name.data()))
-        {
-            for (auto *el: elements) {
-                if ( is_integral(el->type_name)) {
-                    auto *as_void = gui_cast<IntGuiElement>(el);
+        auto makeSimpleGui = [this]() {
+            for (auto* el : elements) {
+                if (is_integral(el->type_name)) {
+                    auto* as_void = gui_cast<IntGuiElement>(el);
                     as_void->makeGui();
                 }
-                if ( is_float(el->type_name)) {
-                    auto *as_void = gui_cast<FloatGuiElement>(el);
+                if (is_float(el->type_name)) {
+                    auto* as_void = gui_cast<FloatGuiElement>(el);
                     as_void->makeGui();
                 }
-                if ( el->type_name == "string" ) {
-                    auto *as_void = gui_cast<StringGuiElement>(el);
+                if (el->type_name == "string") {
+                    auto* as_void = gui_cast<StringGuiElement>(el);
                     as_void->makeGui();
                 }
-                if ( el->type_name == "bool" ) {
-                    auto *as_void = gui_cast<BoolGuiElement>(el);
+                if (el->type_name == "bool") {
+                    auto* as_void = gui_cast<BoolGuiElement>(el);
                     as_void->makeGui();
                 }
-                if ( el->type_name == "serializable" ) {
-                    auto *as_void = gui_cast<SerializableGuiElement>(el);
+            }
+        };
+
+        if (this->name.empty()) {
+            makeSimpleGui();
+            for (auto* el : elements) {
+                if (el->type_name == "serializable") {
+                    auto* as_void = gui_cast<SerializableGuiElement>(el);
                     as_void->makeGui();
                 }
             }
         }
-        
-        if(!this->doc.empty()) { ImGui::SameLine(); HelpMarker(this->doc.data()); }
-        
-        
-        
+        else {
+            if (ImGui::TreeNode(this->name.data()))
+            {
+                makeSimpleGui();
+                for (auto* el : elements) {
+                    if (el->type_name == "serializable") {
+                        auto* as_void = gui_cast<SerializableGuiElement>(el);
+                        as_void->makeGui();
+                    }
+                }
+                ImGui::TreePop();
+            }
+        }
 
+        if(!this->doc.empty()) { ImGui::SameLine(); HelpMarker(this->doc.data()); }
     }
 };
 
@@ -336,9 +359,7 @@ struct SerializableGuiElement: GuiElement<void> {
 
         
         serializableGui.makeGui();
-
         //ImGui::ShowDemoWindow();
-
 
         ImGui::End();
         
