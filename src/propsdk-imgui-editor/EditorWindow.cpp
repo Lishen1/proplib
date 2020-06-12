@@ -147,15 +147,17 @@ public:
     void makeGui() override {
         std::array<char, 128> buffer{};
         std::copy(value.begin(), value.end(), buffer.begin());
-        if (ImGui::InputText((name + " - " + type_name).data(), buffer.data(), buffer.size())){
+        if (ImGui::InputText((name + " - " + type_name).data(), buffer.data(), buffer.size())) {
             value = buffer.data();
+            this->node = value;
+            this->node.SetTag(this->type_name);
         } ImGui::SameLine();
         HelpMarker(doc.data());
         
     }
     StringGuiElement(YAML::iterator &node) : GuiElement(node) {
         try {
-            value = node->second.as<std::string>();
+            value = this->node.as<std::string>();
         } catch (...) {
             std::cout << "fuk";
         }
@@ -173,7 +175,10 @@ struct IntGuiElement: GuiElement<int> {
         node[name.data()] = value = new_value;
     }
     void makeGui() override {
-        ImGui::InputInt((name + " - " + type_name).data(), &value); ImGui::SameLine();
+        if (ImGui::InputInt((name + " - " + type_name).data(), &value)) {
+            this->node = value;
+            this->node.SetTag(this->type_name);
+        } ImGui::SameLine();
         HelpMarker(doc.data());
     }
     IntGuiElement(YAML::iterator &node) : GuiElement(node) {
@@ -196,7 +201,10 @@ struct FloatGuiElement: GuiElement<double> {
         node[name.data()] = value = new_value;
     }
     void makeGui() override {
-        ImGui::InputDouble((name + " - " + type_name).data(), &value); ImGui::SameLine();
+        if (ImGui::InputDouble((name + " - " + type_name).data(), &value)) {
+            this->node = value;
+            this->node.SetTag(this->type_name);
+        } ImGui::SameLine();
         HelpMarker(doc.data());
     }
     FloatGuiElement(YAML::iterator &node) : GuiElement(node) {
