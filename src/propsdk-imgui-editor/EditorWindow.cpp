@@ -280,7 +280,7 @@ struct SerializableGuiElement: GuiElement<void> {
     }
     
     void makeGui() override {
-        auto makeSimpleGui = [this]() {
+        auto makeGui = [this]() {
             for (auto* el : elements) {
                 if (is_integral(el->type_name)) {
                     auto* as_void = gui_cast<IntGuiElement>(el);
@@ -298,28 +298,20 @@ struct SerializableGuiElement: GuiElement<void> {
                     auto* as_void = gui_cast<BoolGuiElement>(el);
                     as_void->makeGui();
                 }
-            }
-        };
-
-        if (this->name.empty()) {
-            makeSimpleGui();
-            for (auto* el : elements) {
                 if (el->type_name == "serializable") {
                     auto* as_void = gui_cast<SerializableGuiElement>(el);
                     as_void->makeGui();
                 }
             }
+        };
+
+        if (this->name.empty()) {
+            makeGui();
         }
         else {
             if (ImGui::TreeNode(this->name.data()))
             {
-                makeSimpleGui();
-                for (auto* el : elements) {
-                    if (el->type_name == "serializable") {
-                        auto* as_void = gui_cast<SerializableGuiElement>(el);
-                        as_void->makeGui();
-                    }
-                }
+                makeGui();
                 ImGui::TreePop();
             }
         }
