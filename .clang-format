@@ -1,0 +1,44 @@
+﻿---
+# We'll use defaults from the LLVM style, but with 4 columns indentation.
+BasedOnStyle: LLVM
+IndentWidth: 2
+---
+
+Language: Cpp
+ColumnLimit: 150
+BreakBeforeBraces: Allman
+# Force pointers to the type for C++.
+DerivePointerAlignment: true
+PointerAlignment: Left
+BreakBeforeBinaryOperators: true 
+# The extra indent or outdent of access modifiers, e.g. public:.
+#AccessModifierOffset: 0
+# This applies to round brackets (parentheses), angle brackets and square brackets.
+AlignAfterOpenBracket: Align
+# If true, aligns consecutive assignments.
+AlignConsecutiveAssignments: true
+# This will align the declaration names of consecutive lines. This will result in formattings like
+AlignConsecutiveDeclarations: true
+# If true, aligns escaped newlines as far left as possible. Otherwise puts them into the right-most column.
+AlignEscapedNewlinesLeft : true
+# If true, horizontally align operands of binary and ternary expressions.
+AlignOperands: false
+# If true, aligns trailing comments
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakTemplateDeclarations: true
+BinPackArguments: true
+BinPackParameters: true
+UseTab: Never
+NamespaceIndentation: All
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializersBeforeComma: true
+ConstructorInitializerIndentWidth: 0 
+---
