@@ -255,13 +255,29 @@ struct VecTypeGuiElement : GuiElement<std::vector<T>> {
 
   }
 
+  virtual void make_input_at_once(const size_t cnt) = 0
+  {
+
+  }
+
   void makeGui() override {
     if (ImGui::TreeNode(this->name.data()))
     {
+      ImGui::SameLine();
       HelpMarker(doc.data());
-      for (size_t i = 0; i < value.size(); ++i)
-        make_input(i);
+      if(value.size() > 1 && value.size() < 5)
+        make_input_at_once(value.size());
+      else
+      {
+        for (size_t i = 0; i < value.size(); ++i)
+          make_input(i);
+      }
       ImGui::TreePop();
+    }
+    else
+    {
+      ImGui::SameLine();
+      HelpMarker(doc.data());
     }
   }
   VecTypeGuiElement(YAML::iterator& node) : GuiElement(node) {
@@ -283,10 +299,30 @@ struct VecIntGuiElement : VecTypeGuiElement<int> {
   VecIntGuiElement(YAML::iterator& node) : VecTypeGuiElement<int>(node){
    
   }
-  virtual void make_input(const size_t i) override
+
+  void make_input(const size_t i) override
   {
     ImGui::InputInt(("["+std::to_string(i)+"]").data(), &value[i]);
   }
+
+  void make_input_at_once(const size_t cnt) override
+  {
+    switch (cnt)
+    {
+    case 2:
+      ImGui::InputInt2("", value.data());
+      break;
+    case 3:
+      ImGui::InputInt3("", value.data());
+      break;
+    case 4:
+      ImGui::InputInt4("", value.data());
+      break;
+    default:
+      break;
+    }
+  }
+
   virtual ~VecIntGuiElement() override = default;
 };
 
@@ -294,10 +330,29 @@ struct VecFloatGuiElement : VecTypeGuiElement<float> {
   VecFloatGuiElement(YAML::iterator& node) : VecTypeGuiElement<float>(node) {
 
   }
-  virtual void make_input(const size_t i) override
+  void make_input(const size_t i) override
   {
     ImGui::InputFloat(("["+std::to_string(i)+"]").data(), &value[i]);
   }
+
+  void make_input_at_once(const size_t cnt) override
+  {
+    switch (cnt)
+    {
+    case 2:
+      ImGui::InputFloat2("", value.data());
+      break;
+    case 3:
+      ImGui::InputFloat3("", value.data());
+      break;
+    case 4:
+      ImGui::InputFloat4("", value.data());
+      break;
+    default:
+      break;
+    }
+  }
+
   virtual ~VecFloatGuiElement() override = default;
 };
 
