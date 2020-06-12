@@ -220,7 +220,8 @@ struct BoolGuiElement: GuiElement<bool> {
     }
     void makeGui() override {
         if (ImGui::Checkbox(( name + " - " + type_name ).data(), &value)) {
-            std::cout << value;
+            this->node = value;
+            this->node.SetTag(this->type_name);
         } ImGui::SameLine();
         HelpMarker(doc.data());
     }
@@ -277,11 +278,7 @@ struct Enumerator {
     auto end() {
         return elements.end();
     }
-
-
 };
-
-
 
 struct SerializableGuiElement: GuiElement<void> {
     private:
@@ -304,20 +301,17 @@ struct SerializableGuiElement: GuiElement<void> {
                 return std::string(begin, shit_type_name.end());
             };
 
-            for (auto &[index, elementNode] : Enumerator<YAML::Node>( this->node.begin(), this->node.end() )) {
+            for (auto [index, elementNode] : Enumerator<YAML::Node>( this->node.begin(), this->node.end() )) {
                 YAML::Node map_node;
                 map_node[std::to_string(index)] = elementNode;
                 map_node[std::to_string(index) + "_doc"] = "";
 
                 map_node[std::to_string(index)].SetTag(get_real_gansta_type_name_fuk(this->type_name));
                 map_node[std::to_string(index) + "_doc"].SetTag("doc");
-                std::cout << map_node.IsMap();
                 elements.push_back(std::make_shared<SerializableGuiElement>(map_node));
             }
-
-            //elements = std::make_shared<SerializableGuiElement>(this->node);
-
         }
+
         ~VectorGuiElement() override = default;
     private:
         std::vector<SerializableGuiElementPtr> elements;
@@ -400,8 +394,8 @@ struct SerializableGuiElement: GuiElement<void> {
 {
     auto window = window_.get();
     ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-
-    auto serializableGui = SerializableGuiElement(YAML::LoadFile("test.yml"));
+    auto root = YAML::LoadFile("test.yml");
+    auto serializableGui = SerializableGuiElement(root);
 
     
     int age_prop{ 77 };
@@ -445,7 +439,10 @@ struct SerializableGuiElement: GuiElement<void> {
 
         // Main body of the Demo window starts here.
         ImGui::Begin("Console");
-        
+        YAML::Emitter out;
+        out << root;
+        ImGui::TextUnformatted(out.c_str());
+
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();
         // Rendering
