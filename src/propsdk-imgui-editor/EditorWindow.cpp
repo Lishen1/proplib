@@ -240,18 +240,108 @@ private:
     bool value;
 };
 
+
+template<typename T>
+struct VecTypeGuiElement : GuiElement<std::vector<T>> {
+  std::vector<T>& get() {
+    return value;
+  }
+  void set(const std::vector<T>& new_value) {
+    node[name.data()] = value = new_value;
+  }
+
+  virtual void make_input(const size_t i) = 0
+  {
+
+  }
+
+  void makeGui() override {
+    if (ImGui::TreeNode(this->name.data()))
+    {
+      HelpMarker(doc.data());
+      for (size_t i = 0; i < value.size(); ++i)
+        make_input(i);
+      ImGui::TreePop();
+    }
+  }
+  VecTypeGuiElement(YAML::iterator& node) : GuiElement(node) {
+    randHash = rand();
+    try {
+      value = this->node.as<std::vector<T>>();
+    }
+    catch (...) {
+      std::cout << "fuk";
+    }
+  }
+  virtual ~VecTypeGuiElement() override = default;
+protected:
+  int randHash;
+  std::vector<T> value;
+};
+
+struct VecIntGuiElement : VecTypeGuiElement<int> {
+  VecIntGuiElement(YAML::iterator& node) : VecTypeGuiElement<int>(node){
+   
+  }
+  virtual void make_input(const size_t i) override
+  {
+    ImGui::InputInt(("["+std::to_string(i)+"]").data(), &value[i]);
+  }
+  virtual ~VecIntGuiElement() override = default;
+};
+
+struct VecFloatGuiElement : VecTypeGuiElement<float> {
+  VecFloatGuiElement(YAML::iterator& node) : VecTypeGuiElement<float>(node) {
+
+  }
+  virtual void make_input(const size_t i) override
+  {
+    ImGui::InputFloat(("["+std::to_string(i)+"]").data(), &value[i]);
+  }
+  virtual ~VecFloatGuiElement() override = default;
+};
+
 template <typename T>
 T* gui_cast(YamlInfo *inherited) {
     return static_cast<T*>(inherited);
 }
 
 auto is_integral = [](std::string_view tname) {
-    std::array types_name = { "int" };
+    std::array types_name = { "int", "int32_t" };
     return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
 };
 auto is_float = [](std::string_view tname) {
     std::array types_name = { "float", "double" };
     return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
+};
+
+auto is_vector = [](std::string_view tname) {
+  std::size_t current = tname.find_first_of(":");
+  if(current == std::string::npos)
+    return std::make_pair(false, current);
+  const auto& vn = tname.substr(0, current);
+  return std::make_pair(vn == "vector", current);
+};
+
+auto is_vector_type = [](std::string_view tname, const std::function<bool(std::string_view)> fn) {
+  const auto& iv = is_vector(tname);
+
+  if (iv.first)
+  {
+    std::size_t current = iv.second;
+    const auto& tn = tname.substr(current+1, tname.size());
+    return fn(tn);
+  }
+  else
+    return false;
+};
+
+auto is_vector_int = [](std::string_view tname) {
+  return is_vector_type(tname, is_integral);
+};
+
+auto is_vector_float = [](std::string_view tname) {
+  return is_vector_type(tname, is_float);
 };
 
 struct SerializableGuiElement: GuiElement<void> {
@@ -264,6 +354,8 @@ struct SerializableGuiElement: GuiElement<void> {
                 if ( is_float(real_gansta_type_name_fuk)) elements.push_back(new FloatGuiElement(iter));
                 if ( real_gansta_type_name_fuk == "string") elements.push_back(new StringGuiElement(iter));
                 if ( real_gansta_type_name_fuk == "bool") elements.push_back(new BoolGuiElement(iter));
+                if (is_vector_float(real_gansta_type_name_fuk)) elements.push_back(new VecFloatGuiElement(iter));
+                if (is_vector_int(real_gansta_type_name_fuk)) elements.push_back(new VecIntGuiElement(iter));
                 if ( real_gansta_type_name_fuk == "serializable") elements.push_back(new SerializableGuiElement(iter));
             }
         }
@@ -297,6 +389,14 @@ struct SerializableGuiElement: GuiElement<void> {
                 if (el->type_name == "bool") {
                     auto* as_void = gui_cast<BoolGuiElement>(el);
                     as_void->makeGui();
+                }
+                if (is_vector_float(el->type_name)) {
+                  auto* as_vf = gui_cast<VecFloatGuiElement>(el);
+                  as_vf->makeGui();
+                }
+                if (is_vector_int(el->type_name)) {
+                  auto* as_vf = gui_cast<VecIntGuiElement>(el);
+                  as_vf->makeGui();
                 }
                 if (el->type_name == "serializable") {
                     auto* as_void = gui_cast<SerializableGuiElement>(el);
