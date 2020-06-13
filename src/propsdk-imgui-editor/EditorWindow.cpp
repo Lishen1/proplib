@@ -95,7 +95,7 @@ struct YamlInfo {
     YAML::NodeType::value type;
     
     YamlInfo() = default;
-    YamlInfo(YAML::iterator &node) {
+    YamlInfo(YAML::iterator &node, YAML::iterator& end) {
         name = node->first.as<std::string>();
         type_name = node->second.Tag();
         this->node = node->second;
@@ -104,17 +104,15 @@ struct YamlInfo {
         YAML::iterator iter = node;
         ++iter;
         // Check we have doc tag
-        if (iter->second.Tag() == "doc") {
-            // we know after node data we put
-            // <DOC> node so we just increment it
-            ++node;
-            try {
+        if (iter != end) {
+            if (iter->second.Tag() == "doc") {
+                // we know after node data we put
+                // <DOC> node so we just increment it
+                ++node;
                 doc = node->second.as<std::string>();
             }
-            catch (...) {
-                std::cout << "fuk";
-            }
         }
+        
     }
 protected:
     YAML::Node node;
@@ -130,7 +128,7 @@ struct GuiElement: YamlInfo {
     
     virtual void makeGui() {}
     GuiElement() = default;
-    GuiElement(YAML::iterator &node) : YamlInfo(node) {}
+    GuiElement(YAML::iterator &node, YAML::iterator& end) : YamlInfo(node, end) {}
     virtual ~GuiElement() = default;
     
 };
@@ -147,19 +145,20 @@ public:
     void makeGui() override {
         std::array<char, 128> buffer{};
         std::copy(value.begin(), value.end(), buffer.begin());
-        if (ImGui::InputText((name + " - " + type_name).data(), buffer.data(), buffer.size())) {
+        if (ImGui::InputText((name).data(), buffer.data(), buffer.size())) {
             value = buffer.data();
             this->node = value;
             this->node.SetTag(this->type_name);
-        } ImGui::SameLine();
-        HelpMarker(doc.data());
+        } 
+        if (!doc.empty()) {
+            ImGui::SameLine(); HelpMarker(doc.data());
+        }
         
     }
-    StringGuiElement(YAML::iterator &node) : GuiElement(node) {
+    StringGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
             value = this->node.as<std::string>();
         } catch (...) {
-            std::cout << "fuk";
         }
     }
     ~StringGuiElement() override = default;
@@ -175,17 +174,18 @@ struct IntGuiElement: GuiElement<int> {
         node[name.data()] = value = new_value;
     }
     void makeGui() override {
-        if (ImGui::InputInt((name + " - " + type_name).data(), &value)) {
+        if (ImGui::InputInt((name).data(), &value)) {
             this->node = value;
             this->node.SetTag(this->type_name);
-        } ImGui::SameLine();
-        HelpMarker(doc.data());
+        }
+        if (!doc.empty()) {
+            ImGui::SameLine(); HelpMarker(doc.data());
+        }
     }
-    IntGuiElement(YAML::iterator &node) : GuiElement(node) {
+    IntGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
             value = this->node.as<int>();
         } catch (...) {
-            std::cout << "fuk";
         }
     }
     virtual ~IntGuiElement() override = default;
@@ -201,17 +201,18 @@ struct FloatGuiElement: GuiElement<double> {
         node[name.data()] = value = new_value;
     }
     void makeGui() override {
-        if (ImGui::InputDouble((name + " - " + type_name).data(), &value)) {
+        if (ImGui::InputDouble((name).data(), &value)) {
             this->node = value;
             this->node.SetTag(this->type_name);
-        } ImGui::SameLine();
-        HelpMarker(doc.data());
+        } 
+        if (!doc.empty()) {
+            ImGui::SameLine(); HelpMarker(doc.data());
+        }
     }
-    FloatGuiElement(YAML::iterator &node) : GuiElement(node) {
+    FloatGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
             value = this->node.as<double>();
         } catch (...) {
-            std::cout << "fuk";
         }
     }
     virtual ~FloatGuiElement() override = default;
@@ -227,17 +228,18 @@ struct BoolGuiElement: GuiElement<bool> {
         node[name.data()] = value = new_value;
     }
     void makeGui() override {
-        if (ImGui::Checkbox(( name + " - " + type_name ).data(), &value)) {
+        if (ImGui::Checkbox(( name ).data(), &value)) {
             this->node = value;
             this->node.SetTag(this->type_name);
-        } ImGui::SameLine();
-        HelpMarker(doc.data());
+        } 
+        if (!doc.empty()) {
+            ImGui::SameLine(); HelpMarker(doc.data());
+        }
     }
-    BoolGuiElement(YAML::iterator &node) : GuiElement(node) {
+    BoolGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
             value = this->node.as<bool>();
         } catch (...) {
-            std::cout << "fuk";
         }
     }
     virtual ~BoolGuiElement() override = default;
@@ -264,6 +266,13 @@ auto is_vector = []( std::string_view tname) {
     auto end = std::find_if(tname.begin(), tname.end(), [](const auto& symbol) {return symbol == ':'; });
     const auto result = std::string(tname.begin(), end);
     return result == "vector";
+};
+
+auto is_map = [](std::string_view tname) {
+    std::size_t current = tname.find_first_of(":");
+    auto end = std::find_if(tname.begin(), tname.end(), [](const auto& symbol) {return symbol == ':'; });
+    const auto result = std::string(tname.begin(), end);
+    return result == "map";
 };
 
 template<typename T>
@@ -302,20 +311,17 @@ struct SerializableGuiElement: GuiElement<void> {
                 ImGui::TreePop();
             }
         }
-        VectorGuiElement(YAML::iterator& node) : GuiElement(node) {
-            auto get_real_gansta_type_name_fuk = [](const auto& shit_type_name) {
-                std::size_t current = shit_type_name.find_first_of(":");
-                auto begin = std::next(std::find_if(shit_type_name.begin(), shit_type_name.end(), [](const auto& symbol) {return symbol == ':'; }));
-                return std::string(begin, shit_type_name.end());
+        VectorGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
+            auto get_real_type_name = [](const auto& stoke_type_name) {
+                std::size_t current = stoke_type_name.find_first_of(":");
+                auto begin = std::next(std::find_if(stoke_type_name.begin(), stoke_type_name.end(), [](const auto& symbol) {return symbol == ':'; }));
+                return std::string(begin, stoke_type_name.end());
             };
 
             for (auto [index, elementNode] : Enumerator<YAML::Node>( this->node.begin(), this->node.end() )) {
                 YAML::Node map_node;
                 map_node[std::to_string(index)] = elementNode;
-                map_node[std::to_string(index) + "_doc"] = "";
-
-                map_node[std::to_string(index)].SetTag(get_real_gansta_type_name_fuk(this->type_name));
-                map_node[std::to_string(index) + "_doc"].SetTag("doc");
+                map_node[std::to_string(index)].SetTag(get_real_type_name(this->type_name));
                 elements.push_back(std::make_shared<SerializableGuiElement>(map_node));
             }
         }
@@ -324,18 +330,50 @@ struct SerializableGuiElement: GuiElement<void> {
     private:
         std::vector<SerializableGuiElementPtr> elements;
     };
+
+    struct MapGuiElement : GuiElement<void> {
+        void makeGui() override {
+            if (ImGui::TreeNode(this->name.data()))
+            {
+                element->makeGui();
+                ImGui::TreePop();
+            }
+        }
+        MapGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
+            auto get_real_type_name = [](const auto& stoke_type_name) {
+                std::size_t current = stoke_type_name.find_first_of(":");
+                auto begin = std::next(std::find_if(stoke_type_name.begin(), stoke_type_name.end(), [](const auto& symbol) {return symbol == ':'; }));
+                return std::string(begin, stoke_type_name.end());
+            };
+            const auto real_type_name = get_real_type_name(get_real_type_name(this->type_name));
+
+            for (YAML::iterator iter = this->node.begin(); iter != this->node.end(); ++iter) {
+                iter->second.SetTag(real_type_name);
+            }
+
+
+            element = std::make_shared<SerializableGuiElement>(this->node);
+            
+        }
+
+        ~MapGuiElement() override = default;
+    private:
+        SerializableGuiElementPtr element;
+    };
+    
     void setup_gui(YAML::Node root) {
 
         if (root.IsMap()) {
             for (YAML::iterator iter = root.begin(); iter != root.end(); ++iter) {
                 if (iter->second.Tag() != "doc") {
-                    const auto& real_gansta_type_name_fuk = iter->second.Tag();
-                    if (is_integral(real_gansta_type_name_fuk)) elements.push_back(std::make_shared<IntGuiElement>(iter));
-                    if (is_float(real_gansta_type_name_fuk)) elements.push_back(std::make_shared < FloatGuiElement>(iter));
-                    if (is_vector(real_gansta_type_name_fuk)) elements.push_back(std::make_shared < VectorGuiElement>(iter));
-                    if (real_gansta_type_name_fuk == "string") elements.push_back(std::make_shared < StringGuiElement>(iter));
-                    if (real_gansta_type_name_fuk == "bool") elements.push_back(std::make_shared < BoolGuiElement>(iter));
-                    if (real_gansta_type_name_fuk == "serializable") elements.push_back(std::make_shared < SerializableGuiElement>(iter));
+                    const auto& real_type_name = iter->second.Tag();
+                    if (is_integral(real_type_name)) elements.push_back(std::make_shared<IntGuiElement>(iter, root.end()));
+                    if (is_float(real_type_name)) elements.push_back(std::make_shared < FloatGuiElement>(iter, root.end()));
+                    if (is_vector(real_type_name)) elements.push_back(std::make_shared < VectorGuiElement>(iter, root.end()));
+                    if (is_map(real_type_name)) elements.push_back(std::make_shared < MapGuiElement>(iter, root.end()));
+                    if (real_type_name == "string") elements.push_back(std::make_shared < StringGuiElement>(iter, root.end()));
+                    if (real_type_name == "bool") elements.push_back(std::make_shared < BoolGuiElement>(iter, root.end()));
+                    if (real_type_name == "serializable") elements.push_back(std::make_shared < SerializableGuiElement>(iter, root.end()));
                 }
             }
         } 
@@ -347,7 +385,7 @@ struct SerializableGuiElement: GuiElement<void> {
         setup_gui(root);
     }
     
-    SerializableGuiElement (YAML::iterator &node) : GuiElement(node) {
+    SerializableGuiElement (YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         setup_gui(this->node);
     }
     
@@ -376,6 +414,10 @@ struct SerializableGuiElement: GuiElement<void> {
                 }
                 if (is_vector(el->type_name)) {
                     auto* as_void = gui_cast<VectorGuiElement>(el.get());
+                    as_void->makeGui();
+                }
+                if (is_map(el->type_name)) {
+                    auto* as_void = gui_cast<MapGuiElement>(el.get());
                     as_void->makeGui();
                 }
             }
