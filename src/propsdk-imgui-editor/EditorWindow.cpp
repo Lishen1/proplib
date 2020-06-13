@@ -287,6 +287,10 @@ struct SerializableGuiElement: GuiElement<void> {
                 }
                 ImGui::TreePop();
             }
+
+            if (!doc.empty()) {
+              ImGui::SameLine(); HelpMarker(doc.data());
+            }
         }
         VectorGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
             auto get_real_type_name = [](const auto& stoke_type_name) {
@@ -313,7 +317,12 @@ struct SerializableGuiElement: GuiElement<void> {
             if (ImGui::TreeNode(this->name.data()))
             {
                 element->makeGui();
+                
+
                 ImGui::TreePop();
+            }
+            if (!doc.empty()) {
+              ImGui::SameLine(); HelpMarker(doc.data());
             }
         }
         MapGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
