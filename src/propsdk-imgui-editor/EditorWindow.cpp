@@ -136,12 +136,6 @@ struct GuiElement: YamlInfo {
 
 struct StringGuiElement: GuiElement<std::string> {
 public:
-    std::string& get() {
-        return value;
-    }
-    void set(const std::string& new_value) {
-        node[name.data()] = value = new_value;
-    }
     void makeGui() override {
         std::array<char, 128> buffer{};
         std::copy(value.begin(), value.end(), buffer.begin());
@@ -157,22 +151,16 @@ public:
     }
     StringGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
-            value = this->node.as<std::string>();
+            value = this->node.as<type_value>();
         } catch (...) {
         }
     }
     ~StringGuiElement() override = default;
 private:
-    std::string value;
+    type_value value;
 };
 
 struct IntGuiElement: GuiElement<int> {
-    int& get() {
-        return value;
-    }
-    void set(const int new_value) {
-        node[name.data()] = value = new_value;
-    }
     void makeGui() override {
         if (ImGui::InputInt((name).data(), &value)) {
             this->node = value;
@@ -184,22 +172,16 @@ struct IntGuiElement: GuiElement<int> {
     }
     IntGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
-            value = this->node.as<int>();
+            value = this->node.as<type_value>();
         } catch (...) {
         }
     }
     virtual ~IntGuiElement() override = default;
 private:
-    int value;
+    type_value value;
 };
 
 struct FloatGuiElement: GuiElement<double> {
-    double& get() {
-        return value;
-    }
-    void set(const int new_value) {
-        node[name.data()] = value = new_value;
-    }
     void makeGui() override {
         if (ImGui::InputDouble((name).data(), &value)) {
             this->node = value;
@@ -211,22 +193,17 @@ struct FloatGuiElement: GuiElement<double> {
     }
     FloatGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
-            value = this->node.as<double>();
+            value = this->node.as<type_value>();
         } catch (...) {
         }
     }
     virtual ~FloatGuiElement() override = default;
 private:
-    double value;
+    type_value value;
 };
 
 struct BoolGuiElement: GuiElement<bool> {
-    bool& get() {
-        return value;
-    }
-    void set(const int new_value) {
-        node[name.data()] = value = new_value;
-    }
+
     void makeGui() override {
         if (ImGui::Checkbox(( name ).data(), &value)) {
             this->node = value;
@@ -238,13 +215,13 @@ struct BoolGuiElement: GuiElement<bool> {
     }
     BoolGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
         try {
-            value = this->node.as<bool>();
+            value = this->node.as<type_value>();
         } catch (...) {
         }
     }
     virtual ~BoolGuiElement() override = default;
 private:
-    bool value;
+    type_value value;
 };
 
 template <typename T>
