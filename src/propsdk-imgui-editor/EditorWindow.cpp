@@ -286,11 +286,13 @@ struct SerializableGuiElement: GuiElement<void> {
                     el->makeGui();
                 }
                 ImGui::TreePop();
+            } else {
+              if (!doc.empty()) {
+                ImGui::SameLine(); HelpMarker(doc.data());
+              }
             }
 
-            if (!doc.empty()) {
-              ImGui::SameLine(); HelpMarker(doc.data());
-            }
+            
         }
         VectorGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
             auto get_real_type_name = [](const auto& stoke_type_name) {
@@ -320,10 +322,12 @@ struct SerializableGuiElement: GuiElement<void> {
                 
 
                 ImGui::TreePop();
+            } else {
+              if (!doc.empty()) {
+                ImGui::SameLine(); HelpMarker(doc.data());
+              }
             }
-            if (!doc.empty()) {
-              ImGui::SameLine(); HelpMarker(doc.data());
-            }
+            
         }
         MapGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
             auto get_real_type_name = [](const auto& stoke_type_name) {
@@ -418,9 +422,12 @@ struct SerializableGuiElement: GuiElement<void> {
                 makeGui();
                 ImGui::TreePop();
             }
+            else {
+
+              if (!this->doc.empty()) { ImGui::SameLine(); HelpMarker(this->doc.data()); }
+            }
         }
 
-        if(!this->doc.empty()) { ImGui::SameLine(); HelpMarker(this->doc.data()); }
     }
 };
 
@@ -430,7 +437,7 @@ struct SerializableGuiElement: GuiElement<void> {
 {
     auto window = window_.get();
     ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-    auto root = YAML::LoadFile("test.yml");
+    auto root = YAML::LoadFile("out.yaml");
     auto serializableGui = SerializableGuiElement(root);
 
     
