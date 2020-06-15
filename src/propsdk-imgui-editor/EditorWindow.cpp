@@ -95,7 +95,7 @@ struct YamlInfo {
     YAML::NodeType::value type;
     
     YamlInfo() = default;
-    YamlInfo(YAML::iterator &node, YAML::iterator& end) {
+    YamlInfo(YAML::iterator node, YAML::iterator end) {
         name = node->first.as<std::string>();
         type_name = node->second.Tag();
         this->node = node->second;
@@ -149,7 +149,7 @@ public:
         }
         
     }
-    StringGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
+    StringGuiElement(YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
         try {
             value = this->node.as<type_value>();
         } catch (...) {
@@ -170,7 +170,7 @@ struct IntGuiElement: GuiElement<int> {
             ImGui::SameLine(); HelpMarker(doc.data());
         }
     }
-    IntGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
+    IntGuiElement(YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
         try {
             value = this->node.as<type_value>();
         } catch (...) {
@@ -191,7 +191,7 @@ struct FloatGuiElement: GuiElement<double> {
             ImGui::SameLine(); HelpMarker(doc.data());
         }
     }
-    FloatGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
+    FloatGuiElement(YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
         try {
             value = this->node.as<type_value>();
         } catch (...) {
@@ -213,7 +213,7 @@ struct BoolGuiElement: GuiElement<bool> {
             ImGui::SameLine(); HelpMarker(doc.data());
         }
     }
-    BoolGuiElement(YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
+    BoolGuiElement(YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
         try {
             value = this->node.as<type_value>();
         } catch (...) {
@@ -230,11 +230,12 @@ T* gui_cast(YamlInfo *inherited) {
 }
 
 auto is_integral = [](std::string_view tname) {
-    std::array types_name = { "int", "int32_t" };
+
+    std::array<const char*, 2> types_name = { "int", "int32_t" };
     return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
 };
 auto is_float = [](std::string_view tname) {
-    std::array types_name = { "float", "double" };
+    std::array<const char*, 2> types_name = {"float", "double"};
     return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
 };
 
@@ -294,7 +295,7 @@ struct SerializableGuiElement: GuiElement<void> {
 
             
         }
-        VectorGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
+        VectorGuiElement(YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
             auto get_real_type_name = [](const auto& stoke_type_name) {
                 std::size_t current = stoke_type_name.find_first_of(":");
                 auto begin = std::next(std::find_if(stoke_type_name.begin(), stoke_type_name.end(), [](const auto& symbol) {return symbol == ':'; }));
@@ -329,7 +330,7 @@ struct SerializableGuiElement: GuiElement<void> {
             }
             
         }
-        MapGuiElement(YAML::iterator& node, YAML::iterator& end) : GuiElement(node, end) {
+        MapGuiElement(YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
             auto get_real_type_name = [](const auto& stoke_type_name) {
                 std::size_t current = stoke_type_name.find_first_of(":");
                 auto begin = std::next(std::find_if(stoke_type_name.begin(), stoke_type_name.end(), [](const auto& symbol) {return symbol == ':'; }));
@@ -375,7 +376,7 @@ struct SerializableGuiElement: GuiElement<void> {
         setup_gui(root);
     }
     
-    SerializableGuiElement (YAML::iterator &node, YAML::iterator& end) : GuiElement(node, end) {
+    SerializableGuiElement (YAML::iterator node, YAML::iterator end) : GuiElement(node, end) {
         setup_gui(this->node);
     }
     
@@ -437,7 +438,7 @@ struct SerializableGuiElement: GuiElement<void> {
 {
     auto window = window_.get();
     ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-    auto root = YAML::LoadFile("out.yaml");
+    auto root = YAML::LoadFile("test.yml");
     auto serializableGui = SerializableGuiElement(root);
 
     
