@@ -46,23 +46,23 @@ Yaml_highlighter::Yaml_highlighter(QTextDocument *parent /*= 0*/) : QSyntaxHighl
 
   classFormat.setFontWeight(QFont::Bold);
   classFormat.setForeground(Qt::darkMagenta);
-  rule.pattern = QRegularExpression("\|");
+  rule.pattern = QRegularExpression(R"(\|)");
   rule.format  = classFormat;
   highlightingRules.append(rule);
 
   quotationFormat.setForeground(Qt::darkGreen);
-  rule.pattern = QRegularExpression("\\[bBAZzG]|\^|\$");
+  rule.pattern = QRegularExpression(R"(\\[bBAZzG]|\^|\$)");
   rule.format  = quotationFormat;
   highlightingRules.append(rule);
 
   functionFormat.setFontItalic(true);
   functionFormat.setForeground(Qt::blue);
-  rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
+  rule.pattern = QRegularExpression(R"(\\b[A-Za-z0-9_]+(?=\\())");
   rule.format  = functionFormat;
   highlightingRules.append(rule);
 
   singleLineCommentFormat.setForeground(Qt::red);
-  rule.pattern = QRegularExpression("//[^\n]*");
+  rule.pattern = QRegularExpression(R"(//[^\n]*)");
   rule.format  = singleLineCommentFormat;
   highlightingRules.append(rule);
 
