@@ -230,11 +230,12 @@ T* gui_cast(YamlInfo *inherited) {
 }
 
 auto is_integral = [](std::string_view tname) {
-  std::array types_name = { "int\0int32_t" };
+
+    std::array<const char*, 2> types_name = { "int", "int32_t" };
     return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
 };
 auto is_float = [](std::string_view tname) {
-    std::array types_name = { "float\0double" };
+    std::array<const char*, 2> types_name = {"float", "double"};
     return std::any_of(types_name.begin(), types_name.end(), [tname](const auto& type) {return type == tname;});
 };
 
