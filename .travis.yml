@@ -11,11 +11,24 @@ language: cpp
 os:
     - linux
     - osx
-  
 compiler:
     - gcc
     - clang
 jobs:
+  matrix:
+    include:
+        - os: linux
+          dist: bionic
+          # sudo: false
+          name: "X11 shared library"
+          addons:
+              apt:
+                  packages:
+                      - libxrandr-dev
+                      - libxinerama-dev
+                      - libxcursor-dev
+                      - libxi-dev
+
     exclude:
         - os:       osx
           compiler: gcc
@@ -24,8 +37,8 @@ jobs:
         - os:  osx
           env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
-before_install:
-  - sudo apt install libxrandr-dev -y
+# before_install:
+#   - sudo apt install libxrandr-dev -y
 install:
     # скрипт настройки среды и установки зависимостей:
     - source travis/install-$TRAVIS_OS_NAME.sh
