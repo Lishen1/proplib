@@ -1,82 +1,36 @@
-dist:     bionic    # используем Ubuntu 14.04 Trusty Tahr (а не 12.02 Precise Pangolin)
-sudo:     required  # используем Virtual Machine (а не Docker container)
+# git:
+#   depth: 3
+#   submodules: false
+# branches:
+#   only:
+#   - master
 
-language: cpp       # на практике разницы между специфичным для C++ окружением
-                    # и, скажем, python -- никакой. Но пусть будет cpp.
+dist:     bionic    
 
+language: cpp
 os:
-    # будем прогонять CI и на Linux, и на Mac OS X...
     - linux
     - osx
-
-addons:
-  apt:
-    # sources:
-      # - george-edison55-precise-backports
-    # packages:
-    #   - cmake-data
-    #   - cmake
-
+  
 compiler:
-    # ... и с помощью GCC, и Clang
     - gcc
     - clang
-
-env:
-    # список переменных окружения, влияющих на матрицу сборки:
-    - BUILD_CONFIGURATION=Debug
-    - BUILD_CONFIGURATION=Release
 jobs:
     exclude:
-        # вручную исключим ненужные элементы из матрицы сборки:
         - os:       osx
           compiler: gcc
-
         - os:  osx
           env: TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
-
         - os:  osx
           env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
-
 install:
-    # - sudo apt purge --auto-remove cmake
-    # - mkdir ~/temp
-    # - cd ~/temp
-    # - wget https://cmake.org/files/v3.17/cmake-3.17.3.tar.gz
-    # - tar -xzvf cmake-3.17.3.tar.gz
-    # - cd cmake-3.17.3/
-    # - ./bootstrap
-    # - make -j$(nproc)
-    # - sudo make install
-
-    - sudo apt purge --auto-remove cmake
-    - sudo mkdir /opt/cmake
-    - cd /opt/cmake
-    - sudo wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh
-    - sudo sh cmake-3.17.3-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
-    - sudo ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
-    - cmake --version
-
     # скрипт настройки среды и установки зависимостей:
-    # - source ci/travis/install-$TRAVIS_OS_NAME.sh
+    - source travis/install-$TRAVIS_OS_NAME.sh
 
 script:
     # скрипт сборки и тестирования проекта:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DTARGET_CPU=$TARGET_CPU
     - cmake --build .
-    # - ctest --output-on-failure
-
-# deploy:
-#     # выкладываем tagged-коммиты на GitHub Releases:
-#     provider:     releases
-#     file:         <package-file>
-#     skip_cleanup: true
-#     overwrite:    true
-
-#     api_key:
-#         secure:   <encrypted-github-token>
-
-#     on:
-#         tags:     true
+#    - ctest --output-on-failure
