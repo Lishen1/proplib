@@ -2,6 +2,7 @@ project(editor)
 
 add_executable( editor
     include/editor/EditorWindow.hpp
+    include/gui/gui.hpp
     EditorWindow.cpp
     main.cpp
 )
