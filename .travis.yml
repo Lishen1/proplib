@@ -13,9 +13,9 @@ addons:
   apt:
     # sources:
       # - george-edison55-precise-backports
-    packages:
-      - cmake-data
-      - cmake
+    # packages:
+    #   - cmake-data
+    #   - cmake
 
 compiler:
     # ... и с помощью GCC, и Clang
@@ -42,6 +42,17 @@ jobs:
           env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
 install:
+    - sudo apt purge --auto-remove cmake
+    - set cmake_version 3.17
+    - set cmake_build 3
+    - mkdir ~/temp
+    - cd ~/temp
+    - wget https://cmake.org/files/v$cmake_version/cmake-$cmake_version.$cmake_build.tar.gz
+    - tar -xzvf cmake-$cmake_version.$cmake_build.tar.gz
+    - cd cmake-$cmake_version.$cmake_build/
+    - source bootstrap
+    - make -j$(nproc)
+    - sudo make install
     # скрипт настройки среды и установки зависимостей:
     # - source ci/travis/install-$TRAVIS_OS_NAME.sh
 
