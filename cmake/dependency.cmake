@@ -30,7 +30,13 @@ if ( QT_EDITOR_ENABLED )
     #  "YAML_CPP_BUILD_CONTRIB Off"
     #  "YAML_CPP_BUILD_TOOLS Off"
   )
-  set ( TARGET_EDITOR QtnProperty)
+  CPMAddPackage(
+    NAME cpp-httplib
+    GITHUB_REPOSITORY yhirose/cpp-httplib
+    VERSION 0.6.5
+  )
+
+  set ( TARGET_EDITOR QtnProperty httplib)
 else()
 
   CPMAddPackage(
