@@ -24,11 +24,8 @@ compiler:
 
 env:
     # список переменных окружения, влияющих на матрицу сборки:
-    - TARGET_CPU=amd64 BUILD_CONFIGURATION=Debug
-    - TARGET_CPU=amd64 BUILD_CONFIGURATION=Release
-    - TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
-    - TARGET_CPU=x86 BUILD_CONFIGURATION=Release
-
+    - BUILD_CONFIGURATION=Debug
+    - BUILD_CONFIGURATION=Release
 jobs:
     exclude:
         # вручную исключим ненужные элементы из матрицы сборки:
@@ -57,7 +54,7 @@ install:
     - cd /opt/cmake
     - wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh
     - sh cmake-3.17.3-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
-    - ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
+    - sudo ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
 
 
     # скрипт настройки среды и установки зависимостей:
