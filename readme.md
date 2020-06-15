@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Lishen1/proplib.svg?branch=master)](https://travis-ci.org/Lishen1/proplib)
+[![Build Status](https://travis-ci.org/Lishen1/proplib.svg?branch=ci)](https://travis-ci.org/Lishen1/proplib)
 # Properties serialization library
 **proplib** is a set of crossplatform c++11 libraries and tools which allow serialize, deserialize, visualize and edit c++ objects without codegeneration what well suitable for algorithms  properties configuration.
 
