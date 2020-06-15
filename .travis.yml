@@ -9,6 +9,14 @@ os:
     - linux
     - osx
 
+addons:
+  apt:
+    # sources:
+      # - george-edison55-precise-backports
+    packages:
+      - cmake-data
+      - cmake
+
 compiler:
     # ... и с помощью GCC, и Clang
     - gcc
@@ -21,7 +29,7 @@ env:
     - TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
     - TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
-matrix:
+jobs:
     exclude:
         # вручную исключим ненужные элементы из матрицы сборки:
         - os:       osx
