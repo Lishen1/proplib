@@ -42,21 +42,21 @@ jobs:
           env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
 install:
-    # - sudo apt purge --auto-remove cmake
-    # - mkdir ~/temp
-    # - cd ~/temp
-    # - wget https://cmake.org/files/v3.17/cmake-3.17.3.tar.gz
-    # - tar -xzvf cmake-3.17.3.tar.gz
-    # - cd cmake-3.17.3/
-    # - ./bootstrap
-    # - make -j$(nproc)
-    # - sudo make install
-
     - sudo apt purge --auto-remove cmake
-    - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-    - sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-    - sudo apt update
-    - sudo apt install cmake
+    - mkdir ~/temp
+    - cd ~/temp
+    - wget https://cmake.org/files/v3.17/cmake-3.17.3.tar.gz
+    - tar -xzvf cmake-3.17.3.tar.gz
+    - cd cmake-3.17.3/
+    - ./bootstrap
+    - make -j$(nproc)
+    - sudo make install
+
+    # - sudo apt purge --auto-remove cmake
+    # - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+    # - sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+    # - sudo apt update
+    # - sudo apt install cmake
 
 
     # скрипт настройки среды и установки зависимостей:
