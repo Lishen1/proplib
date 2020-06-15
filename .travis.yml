@@ -14,13 +14,14 @@
 #     - clang
 jobs:
   include:
+      language: cpp
       - os: linux
         dist: bionic
         compiler:
           - gcc
           - clang
         # sudo: false
-        name: "X11 shared library"
+        name: "ubuntu x11"
         addons:
             apt:
                 packages:
