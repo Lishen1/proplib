@@ -55,7 +55,7 @@ install:
     - wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh
     - sh cmake-3.17.3-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
     - sudo ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
-
+    - cmake --version
 
     # скрипт настройки среды и установки зависимостей:
     # - source ci/travis/install-$TRAVIS_OS_NAME.sh
