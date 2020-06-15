@@ -53,5 +53,5 @@ script:
     - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
     - cmake --build .
     - cd tests
-    - ctest -C $BUILD_CONFIGURATION -VV  
+    - ctest -C $BUILD_CONFIGURATION
 #    - ctest --output-on-failure
