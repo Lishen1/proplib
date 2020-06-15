@@ -5,8 +5,6 @@
 #   only:
 #   - master
 
-dist:     bionic    
-
 language: cpp
 os:
     - linux
@@ -15,27 +13,26 @@ compiler:
     - gcc
     - clang
 jobs:
-  matrix:
-    include:
-        - os: linux
-          dist: bionic
-          # sudo: false
-          name: "X11 shared library"
-          addons:
-              apt:
-                  packages:
-                      - libxrandr-dev
-                      - libxinerama-dev
-                      - libxcursor-dev
-                      - libxi-dev
+  include:
+      - os: linux
+        dist: bionic
+        # sudo: false
+        name: "X11 shared library"
+        addons:
+            apt:
+                packages:
+                    - libxrandr-dev
+                    - libxinerama-dev
+                    - libxcursor-dev
+                    - libxi-dev
 
-    exclude:
-        - os:       osx
-          compiler: gcc
-        - os:  osx
-          env: TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
-        - os:  osx
-          env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
+  exclude:
+      - os:       osx
+        compiler: gcc
+      - os:  osx
+        env: TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
+      - os:  osx
+        env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
 # before_install:
 #   - sudo apt install libxrandr-dev -y
