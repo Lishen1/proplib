@@ -15,6 +15,3 @@ wget $CMAKE_URL
 mkdir -p $CMAKE_DIR
 tar --strip-components=1 -xzf $CMAKE_TAR -C $CMAKE_DIR
 export PATH=$CMAKE_DIR/bin:$PATH
-
-sudo apt install libxrandr-dev -y
-
