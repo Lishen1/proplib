@@ -5,33 +5,32 @@
 #   only:
 #   - master
 
-# language: cpp
-# os:
-#     - linux
-#     - osx
-# compiler:
-#     - gcc
-#     - clang
+dist: bionic
+language: cpp
+os:
+    - linux
+    - osx
+compiler:
+    - gcc
+    - clang
+
+addons:
+  apt:
+    packages:
+        - libxrandr-dev
+        - libxinerama-dev
+        - libxcursor-dev
+        - libxi-dev
+        - libglu1-mesa-dev
+        - freeglut3-dev
+        - mesa-common-dev
+
 jobs:
-  include:
-      language: cpp
-      - os: linux
-        dist: bionic
-        compiler:
-          - gcc
-          - clang
-        # sudo: false
-        name: "ubuntu x11"
-        addons:
-            apt:
-                packages:
-                    - libxrandr-dev
-                    - libxinerama-dev
-                    - libxcursor-dev
-                    - libxi-dev
-                    - libglu1-mesa-dev
-                    - freeglut3-dev
-                    - mesa-common-dev
+  # include:
+  #     - os: linux
+  #       # sudo: false
+  #       name: "ubuntu x11"
+        
 
   exclude:
       - os:       osx
