@@ -1,4 +1,4 @@
-dist:     trusty    # используем Ubuntu 14.04 Trusty Tahr (а не 12.02 Precise Pangolin)
+dist:     bionic    # используем Ubuntu 14.04 Trusty Tahr (а не 12.02 Precise Pangolin)
 sudo:     required  # используем Virtual Machine (а не Docker container)
 
 language: cpp       # на практике разницы между специфичным для C++ окружением
