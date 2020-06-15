@@ -56,7 +56,7 @@ install:
     - mkdir /opt/cmake
     - cd /opt/cmake
     - wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.sh
-    - sh /cmake-3.17.3-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+    - sh cmake-3.17.3-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
     - ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
 
 
