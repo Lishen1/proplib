@@ -20,6 +20,17 @@ CPMAddPackage(
     "YAML_CPP_BUILD_TOOLS Off"
 )
 
+if ( TESTS_ENABLED )
+  CPMAddPackage(
+    NAME googletest
+    GITHUB_REPOSITORY google/googletest
+    VERSION 1.10.x
+    OPTIONS
+        "INSTALL_GTEST OFF"
+        "gtest_force_shared_crt"
+  )
+endif()
+
 if ( QT_EDITOR_ENABLED )
   CPMAddPackage(
     NAME QtnProperty
