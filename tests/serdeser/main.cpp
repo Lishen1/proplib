@@ -244,6 +244,4 @@ TEST(PropLibTests, SerDeser)
 	proplib::res_t res = deser_test.deserialize(saved_yml);
 
 	ASSERT_TRUE(ser_test == deser_test);
-	ASSERT_TRUE(false);
-
 }
