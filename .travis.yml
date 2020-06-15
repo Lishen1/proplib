@@ -5,17 +5,20 @@
 #   only:
 #   - master
 
-language: cpp
-os:
-    - linux
-    - osx
-compiler:
-    - gcc
-    - clang
+# language: cpp
+# os:
+#     - linux
+#     - osx
+# compiler:
+#     - gcc
+#     - clang
 jobs:
   include:
       - os: linux
         dist: bionic
+        compiler:
+          - gcc
+          - clang
         # sudo: false
         name: "X11 shared library"
         addons:
@@ -25,6 +28,9 @@ jobs:
                     - libxinerama-dev
                     - libxcursor-dev
                     - libxi-dev
+                    - libglu1-mesa-dev
+                    - freeglut3-dev
+                    - mesa-common-dev
 
   exclude:
       - os:       osx
@@ -44,6 +50,6 @@ script:
     # скрипт сборки и тестирования проекта:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DTARGET_CPU=$TARGET_CPU
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
     - cmake --build .
 #    - ctest --output-on-failure
