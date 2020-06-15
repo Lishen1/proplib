@@ -354,7 +354,7 @@ struct SerializableGuiElement: GuiElement<void> {
     void setup_gui(YAML::Node root) {
 
         if (root.IsMap()) {
-            for (YAML::iterator iter = root.begin(); iter != root.end(); ++iter) {
+            for (YAML::iterator& iter = root.begin(); iter != root.end(); ++iter) {
                 if (iter->second.Tag() != "doc") {
                     const auto& real_type_name = iter->second.Tag();
                     if (is_integral(real_type_name)) elements.push_back(std::make_shared<IntGuiElement>(iter, root.end()));
