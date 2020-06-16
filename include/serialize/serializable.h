@@ -12,81 +12,80 @@
 
 namespace proplib
 {
+  namespace serdes
+  {
+    template <typename T>
+    void begin_map(T& node)
+    {
+    }
+
+    template <typename T>
+    void end_map(T& node)
+    {
+    }
+  } // namespace serdes
+
   class IContainer
   {
-    public:
+  public:
     virtual ~IContainer() = default;
   };
 
   template <class Ser>
   class Container : public IContainer
   {
-    public:
+  public:
     Container(Ser& node) : _node(node){};
     Ser&       node() { return _node; }
     const Ser& node() const { return _node; }
 
-    private:
+  private:
     Ser& _node;
   };
 
   class Serializable
   {
-      using Function     = std::function<res_t(const std::string&, IContainer*)>;
-      using VoidFunction =  std::function<void()>;
-      
-    protected:
-      struct Serializer_pair
-      {
-          Function serializer;
-          Function deserializer;
-      };
+    using Function     = std::function<res_t(const std::string&, IContainer*)>;
+    using VoidFunction = std::function<void()>;
 
-      int add_serdes_lambda(std::string _key, Function serializer, Function deserializer)
-      {
-        auto& lv_Pair        = _serializers[_key];
-        lv_Pair.serializer   = serializer;
-        lv_Pair.deserializer = deserializer;
-        return 0;
-      }
+  protected:
+    struct Serializer_pair
+    {
+      Function serializer;
+      Function deserializer;
+    };
 
-      char serialize_subs(VoidFunction function)
-      {
-          _subs_deser_func = function;
-          return 0;
-      }
-    public:
-      
-      bool add_subprop(Serializable* p, const std::string& name)
-      {
-          subprops[name] = p;
-          return true;
-      }
-      
-      void set_logger(const std::string& logger_id) { _logger_id = logger_id; }
-    
-      template <class T>
-      res_t serialize(T& cont, const bool& scheme = false) const
-      {
-        _scheme = scheme;
-        if (_subs_deser_func)
-          _subs_deser_func();
-  
-        Container<clear_type_v<T>> container(cont);
-        for (auto& lv_ser : _serializers)
-          if (lv_ser.second.serializer(lv_ser.first, &container) != res_t::ok)
-          {
-#if ENABLE_SERDES_LOGGING
-            CLOG(ERROR, _logger_id.c_str()) << "failed to serialize key "
-                                            << "\"" << lv_ser.first << "\""
-                                            << " with container "
-                                            << "\"" << typeid(T).name() << "\".";
-#endif
-            return res_t::error;
-          }
-  
-        return res_t::ok;
-      }
+    int add_serdes_lambda(std::string _key, Function serializer, Function deserializer)
+    {
+      auto& lv_Pair        = _serializers[_key];
+      lv_Pair.serializer   = serializer;
+      lv_Pair.deserializer = deserializer;
+      return 0;
+    }
+
+    char serialize_subs(VoidFunction function)
+    {
+      _subs_deser_func = function;
+      return 0;
+    }
+
+  public:
+    bool add_subprop(Serializable* p, const std::string& name)
+    {
+      subprops[name] = p;
+      return true;
+    }
+
+    void set_logger(const std::string& logger_id) { _logger_id = logger_id; }
+
+    template <class T>
+    res_t serialize(T& cont, const bool& scheme = false) const
+    {
+      serdes::begin_map(cont);
+      res_t res = this->template leaf_serialize<T>(cont, scheme);
+      serdes::end_map(cont);
+      return res;
+    }
 
     template <class T>
     res_t deserialize(T& cont) const
@@ -121,13 +120,37 @@ namespace proplib
       return res_t::ok;
     }
 
-    protected:
+    // should be a protected friend function but too complicated to implement
+  public:
+    template <class T>
+    res_t leaf_serialize(T& cont, const bool& scheme = false) const
+    {
+      _scheme = scheme;
+      if (_subs_deser_func)
+        _subs_deser_func();
+
+      Container<clear_type_v<T>> container(cont);
+      for (auto& lv_ser : _serializers)
+        if (lv_ser.second.serializer(lv_ser.first, &container) != res_t::ok)
+        {
+#if ENABLE_SERDES_LOGGING
+          CLOG(ERROR, _logger_id.c_str()) << "failed to serialize key "
+                                          << "\"" << lv_ser.first << "\""
+                                          << " with container "
+                                          << "\"" << typeid(T).name() << "\".";
+#endif
+          return res_t::error;
+        }
+      return res_t::ok;
+    }
+
+  protected:
     std::string                          _logger_id;
     std::map<std::string, Serializable*> subprops;
     VoidFunction                         _subs_deser_func = nullptr;
     mutable bool                         _scheme          = false;
 
-    private:
+  private:
     std::map<std::string, Serializer_pair> _serializers;
   };
 } // namespace proplib
