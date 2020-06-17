@@ -34,9 +34,7 @@ int main()
   box.name = "just a small box in the big world";
 
   YAML::Emitter out;
-  out << YAML::BeginMap;
   box.serialize(out, false);
-  out << YAML::EndMap;
   std::ofstream outfile;
   outfile.open("box.prop.yml");
   outfile << out.c_str() << std::endl;
@@ -87,7 +85,11 @@ width_doc: !<doc> width of the box
 ```
 then we can open, edit and save this file in **proplib-qt-editor**
 
-![alt text](img/editor.png "proplib-qt-editor")
+![alt text](img/qt-editor.png "proplib-qt-editor")
+
+or in ImGui based **proplib-imgui-editor**
+
+![alt text](img/imgui-editor.png "proplib-imgui-editor")
 
 ## Supported types
 - arithmetic
@@ -104,6 +106,7 @@ then we can open, edit and save this file in **proplib-qt-editor**
 - **proplib-gui**
   - **proplib-qt-gui**  - qt based qui lib
 - **proplib-qt-editor** -  qt based editor app
+- **propsdk-imgui-editor** -  imgui based editor app
 - **tests**
   - **prop-serialize** - serialization/deserialization test
   - **http-client** - remote transfer test
