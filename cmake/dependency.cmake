@@ -57,6 +57,14 @@ else()
     OPTIONS 
     "IMGUI_BUILD_EXAMPLES OFF"
   )
+  CPMAddPackage(
+    NAME imgui-filebrowser
+    GITHUB_REPOSITORY AirGuanZ/imgui-filebrowser
+    GIT_TAG master
+    OPTIONS 
+    "IMGUI_BUILD_EXAMPLES OFF"
+  )
+  target_include_directories( imgui PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-filebrowser-src)
   set ( TARGET_EDITOR imgui )
 endif()
 

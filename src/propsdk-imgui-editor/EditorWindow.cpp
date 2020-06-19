@@ -9,6 +9,8 @@
 
 #include <gui/gui.hpp>
 
+#include <imfilebrowser.h>
+
 
 namespace editor {
 
@@ -78,9 +80,14 @@ int EditorWindow::setup_window()
 {
     auto window = window_.get();
     ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-    auto root = YAML::LoadFile("test.yml");
-    auto serializableGui = gui::SerializableGuiElement(root);
+    auto root = YAML::Node();
+    gui::SerializableGuiElementPtr serializableGui;
 
+    ImGui::FileBrowser fileDialog;
+
+    // (optional) set browser properties
+    fileDialog.SetTitle("title");
+    fileDialog.SetTypeFilters({ ".yaml", ".yml" });
     
     int age_prop{ 77 };
     // Main loop
@@ -94,18 +101,48 @@ int EditorWindow::setup_window()
 
         // Recive new frame
         new_frame();
+        // Menu Bar
+        
 
 //        ImGui::ShowDemoWindow();
         ImGui::SetNextWindowPos(ImVec2(50, 20), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(550, 340), ImGuiCond_FirstUseEver);
-
+        bool is_opened{true};
         // Main body of the Demo window starts here.
-        ImGui::Begin("Property - Simple Test class with scalar and basic sequnece");
-        
-        serializableGui.makeGui();
-        //ImGui::ShowDemoWindow();
+        if(ImGui::Begin("Property ", &is_opened, ImGuiWindowFlags_MenuBar)) {
 
+          if (ImGui::BeginMenuBar())
+          {
+            if (ImGui::BeginMenu("File"))
+            {
+              if(ImGui::MenuItem("Open")) {
+                fileDialog.Open();
+              }
+              ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+          }
+
+          fileDialog.Display();
+          if (serializableGui) {
+            // open file dialog when user clicks this button
+            serializableGui->makeGui();
+          } 
+
+          if (fileDialog.HasSelected())
+          {
+            root = YAML::LoadFile(fileDialog.GetSelected().string());
+            serializableGui = std::make_shared<gui::SerializableGuiElement>(root);
+            fileDialog.ClearSelected();
+          }
+        }
         ImGui::End();
+        
+
+        
+        //serializableGui->makeGui();
+       // ImGui::ShowDemoWindow();
+
         
         ImGui::SetNextWindowPos(ImVec2(50, 380), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(550, 200), ImGuiCond_FirstUseEver);

@@ -1,6 +1,10 @@
 #ifndef EDITOR_GUI_HPP
 #define EDITOR_GUI_HPP
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <yaml-cpp/yaml.h>
 #include <algorithm>
 #include <array>
@@ -205,12 +209,10 @@ template <typename T> struct Enumerator {
   auto end() { return elements.end(); }
 };
 
-struct SerializableGuiElement;
-using SerializableGuiElementPtr = std::shared_ptr<SerializableGuiElement>;
-
 struct SerializableGuiElement : GuiElement<void> {
 private:
   using YamlInfoPtr = std::shared_ptr<YamlInfo>;
+  using SerializableGuiElementPtr = std::shared_ptr<SerializableGuiElement>;
   struct VectorGuiElement : GuiElement<void> {
     void makeGui() override {
       if (ImGui::TreeNode(this->name.data())) {
