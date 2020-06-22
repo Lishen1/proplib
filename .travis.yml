@@ -45,6 +45,8 @@ jobs:
 install:
     # скрипт настройки среды и установки зависимостей:
     - source travis/install-$TRAVIS_OS_NAME.sh
+    - sudo add-apt-repository ppa:jonathonf/gcc
+    - sudo apt-get install gcc-9
 
 script:
     # скрипт сборки и тестирования проекта:
