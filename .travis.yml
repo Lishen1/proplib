@@ -6,6 +6,8 @@
 #   - master
 
 dist: bionic
+osx_image: xcode11.6
+
 language: cpp
 os:
     - linux
