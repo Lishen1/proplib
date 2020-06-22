@@ -40,13 +40,14 @@ jobs:
       - os:  osx
         env: TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
-# before_install:
+before_install:
+    - sudo add-apt-repository ppa:jonathonf/gcc -y
+    - sudo apt-get install gcc-9 -y
 #   - sudo apt install libxrandr-dev -y
 install:
     # скрипт настройки среды и установки зависимостей:
     - source travis/install-$TRAVIS_OS_NAME.sh
-    - sudo add-apt-repository ppa:jonathonf/gcc -y
-    - sudo apt-get install gcc-9 -y
+
 
 script:
     # скрипт сборки и тестирования проекта:
