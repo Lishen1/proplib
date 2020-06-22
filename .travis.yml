@@ -28,6 +28,7 @@ addons:
         - libglu1-mesa-dev
         - freeglut3-dev
         - mesa-common-dev
+        - clang-9
         - clang-10
         - gcc-9
         - g++-9
