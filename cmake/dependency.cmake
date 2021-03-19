@@ -31,41 +31,42 @@ if ( TESTS_ENABLED )
   )
 endif()
 
-if ( QT_EDITOR_ENABLED )
-  CPMAddPackage(
-    NAME QtnProperty
-    GITHUB_REPOSITORY ueberaccelerate/QtnProperty
-    GIT_TAG master
-    OPTIONS
-    #  "YAML_CPP_BUILD_TESTS Off"
-    #  "YAML_CPP_BUILD_CONTRIB Off"
-    #  "YAML_CPP_BUILD_TOOLS Off"
-  )
-  CPMAddPackage(
-    NAME cpp-httplib
-    GITHUB_REPOSITORY yhirose/cpp-httplib
-    VERSION 0.6.5
-  )
+if( EDITOR_ENABLED )
+  if ( QT_EDITOR_ENABLED )
+    CPMAddPackage(
+      NAME QtnProperty
+      GITHUB_REPOSITORY ueberaccelerate/QtnProperty
+      GIT_TAG master
+      OPTIONS
+      #  "YAML_CPP_BUILD_TESTS Off"
+      #  "YAML_CPP_BUILD_CONTRIB Off"
+      #  "YAML_CPP_BUILD_TOOLS Off"
+    )
+    CPMAddPackage(
+      NAME cpp-httplib
+      GITHUB_REPOSITORY yhirose/cpp-httplib
+      VERSION 0.6.5
+    )
 
-  set ( TARGET_EDITOR QtnProperty httplib)
-else()
-
-  CPMAddPackage(
-    NAME imgui
-    GITHUB_REPOSITORY ueberaccelerate/imgui
-    GIT_TAG master
-    OPTIONS 
-    "IMGUI_BUILD_EXAMPLES OFF"
-  )
-  CPMAddPackage(
-    NAME imgui-filebrowser
-    GITHUB_REPOSITORY AirGuanZ/imgui-filebrowser
-    GIT_TAG master
-    OPTIONS 
-    "IMGUI_BUILD_EXAMPLES OFF"
-  )
-  target_include_directories( imgui PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-filebrowser-src)
-  set ( TARGET_EDITOR imgui )
+    set ( TARGET_EDITOR QtnProperty httplib)
+  else()
+    CPMAddPackage(
+      NAME imgui
+      GITHUB_REPOSITORY ueberaccelerate/imgui
+      GIT_TAG master
+      OPTIONS 
+      "IMGUI_BUILD_EXAMPLES OFF"
+    )
+    CPMAddPackage(
+      NAME imgui-filebrowser
+      GITHUB_REPOSITORY AirGuanZ/imgui-filebrowser
+      GIT_TAG master
+      OPTIONS 
+      "IMGUI_BUILD_EXAMPLES OFF"
+    )
+    target_include_directories( imgui PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-filebrowser-src)
+    set ( TARGET_EDITOR imgui )
+  endif()
 endif()
 
 function (set_dependency target_name target_type ) 
