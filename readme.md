@@ -8,8 +8,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "serializable.h"
-#include "serialize.h"
+#include <serialize/serializable.h>
+#include <serialize/serialize.h>
 #include <yaml-cpp/yaml.h>
 
 class Box : public proplib::Serializable
