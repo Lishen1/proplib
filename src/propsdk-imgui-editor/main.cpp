@@ -1,9 +1,5 @@
 #include <editor/EditorWindow.hpp>
 
-//#include <serialize/proplib.h>
-//#include <easylogging++.h>
-//INITIALIZE_EASYLOGGINGPP
-
 int main(int, char **)
 {
     editor::EditorWindow window;

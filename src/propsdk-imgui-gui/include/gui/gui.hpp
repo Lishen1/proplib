@@ -208,11 +208,11 @@ template <typename T> struct Enumerator {
 
   auto end() { return elements.end(); }
 };
-
+struct SerializableGuiElement;
+using SerializableGuiElementPtr = std::shared_ptr<SerializableGuiElement>;
 struct SerializableGuiElement : GuiElement<void> {
 private:
   using YamlInfoPtr = std::shared_ptr<YamlInfo>;
-  using SerializableGuiElementPtr = std::shared_ptr<SerializableGuiElement>;
   struct VectorGuiElement : GuiElement<void> {
     void makeGui() override {
       if (ImGui::TreeNode(this->name.data())) {
