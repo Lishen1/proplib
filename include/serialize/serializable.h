@@ -55,7 +55,7 @@ namespace proplib
       Function deserializer;
     };
 
-    int add_serdes_lambda(std::string _key, Function serializer, Function deserializer)
+    char add_serdes_lambda(std::string _key, Function serializer, Function deserializer)
     {
       auto& lv_Pair        = _serializers[_key];
       lv_Pair.serializer   = serializer;

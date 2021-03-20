@@ -126,8 +126,8 @@ namespace proplib
       for (auto& el : *val)
       {
         node << YAML::Value << YAML::BeginMap;
-        el->set_logger(logger_id);
-        if (el->leaf_serialize(node, scheme) != res_t::ok)
+        call_as_ptr<T>::ptr(el)->set_logger(logger_id);
+        if (call_as_ptr<T>::ptr(el)->leaf_serialize(node, scheme) != res_t::ok)
         {
 #if ENABLE_SERDES_LOGGING
           CLOG(ERROR, logger_id.c_str()) << "failed to serialize key "
@@ -308,9 +308,9 @@ namespace proplib
 
         for (auto n : nodes)
         {
-          T s = new typename clear_type<T>::type();
-          s->set_logger(logger_id);
-          res_t res = s->deserialize(n);
+          T s = create_var<T>::create();
+          call_as_ptr<T>::ptr(s)->set_logger(logger_id);
+          res_t res = call_as_ptr<T>::ptr(s)->deserialize(n);
           if (res == res_t::error)
           {
 #if ENABLE_SERDES_LOGGING
