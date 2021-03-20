@@ -4,7 +4,7 @@
 #include "serializable.h"
 #include "tools.h"
 #include "types.h"
-#include <easylogging++.h>
+//#include <easylogging++.h>
 #include <type_traits>
 #include <yaml-cpp/yaml.h>
 

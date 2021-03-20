@@ -29,4 +29,4 @@ add_git_dependency(
   OPTIONS           "IMGUI_BUILD_EXAMPLES OFF"
 )
 target_include_directories( imgui PUBLIC ${PROPLIB_BINARY_DIR}/_deps/imgui-filebrowser-src)
-target_link_libraries( propimgui INTERFACE ${PROPLIB_NAME} imgui yaml-cpp)
+target_link_libraries( propimgui INTERFACE ${PROPLIB_NAME} imgui)

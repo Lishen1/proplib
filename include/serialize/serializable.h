@@ -8,7 +8,7 @@
 #include "tools.h"
 #include "types.h"
 
-#include <easylogging++.h>
+//#include <easylogging++.h>
 
 namespace proplib
 {

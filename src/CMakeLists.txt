@@ -11,7 +11,10 @@ target_include_directories(
   ${PROPLIB_NAME} 
   INTERFACE 
     ${PROPLIB_SOURCE_DIR}/include)
-
+target_link_libraries(
+  ${PROPLIB_NAME} 
+  INTERFACE 
+    yaml-cpp )
 
 if ( BUILD_PROPLIB_WITH_EDITOR )
   if ( BUILD_PROPLIB_WITH_QT_EDITOR )

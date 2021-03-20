@@ -1,6 +1,6 @@
 #include <serialize/proplib.h>
 
-#include <easylogging++.h>
+//#include <easylogging++.h>
 
 #include <yaml-cpp/yaml.h>
 
@@ -16,7 +16,7 @@
 #include <cstdlib>
 #include <cmath>
 
-INITIALIZE_EASYLOGGINGPP
+//INITIALIZE_EASYLOGGINGPP
 
 
 
@@ -181,7 +181,7 @@ private:
 
 int main()
 {
-	el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
+	//el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
 
 	TestClass_2 ser_test;
 
@@ -191,13 +191,13 @@ int main()
 	out << YAML::BeginMap;
 	std::string name = "serialize";
 
-	el::Logger* businessLogger = el::Loggers::getLogger(name);
+	//el::Logger* businessLogger = el::Loggers::getLogger(name);
 
-	el::Configurations defaultConf;
-	defaultConf.setToDefault();
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %level %msg");
+	//el::Configurations defaultConf;
+	//defaultConf.setToDefault();
+	//defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %level %msg");
 
-	el::Loggers::reconfigureLogger(name, defaultConf);
+	//el::Loggers::reconfigureLogger(name, defaultConf);
 
 	std::string name2 = name;
 

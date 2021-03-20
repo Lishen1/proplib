@@ -1,3 +1,3 @@
 #pragma once
 
-#define ENABLE_SERDES_LOGGING 1
+#define ENABLE_SERDES_LOGGING 0
