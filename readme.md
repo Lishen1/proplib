@@ -85,11 +85,11 @@ width_doc: !<doc> width of the box
 ```
 then we can open, edit and save this file in **proplib-qt-editor**
 
-![alt text](img/qt-editor.png "proplib-qt-editor")
+![alt text](doc/img/qt-editor.png "proplib-qt-editor")
 
 or in ImGui based **proplib-imgui-editor**
 
-![alt text](img/imgui-editor.png "proplib-imgui-editor")
+![alt text](doc/img/imgui-editor.png "proplib-imgui-editor")
 
 ## Supported types
 - arithmetic

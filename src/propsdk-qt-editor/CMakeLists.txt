@@ -5,6 +5,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets Gui Script REQUIRED)
+find_package(Threads)
 add_executable ( qt-editor
   main.cpp
   yaml_highlighter.cpp
@@ -20,12 +21,8 @@ add_executable ( qt-editor
 
 add_subdirectory(include)
 target_include_directories ( qt-editor PRIVATE include)
-target_link_libraries( qt-editor PRIVATE propsdk qt-gui-module Qt5::Widgets Qt5::Gui Qt5::Script )
+target_link_libraries( qt-editor PRIVATE propsdk qt-gui-module Qt5::Widgets Qt5::Gui Qt5::Script Threads::Threads)
 
 
-
-if (UNIX)
-  target_link_libraries( qt-editor PRIVATE pthread )
-endif()
 
 

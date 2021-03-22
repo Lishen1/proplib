@@ -69,6 +69,48 @@ namespace proplib
 
 	//-------------------
 
+	template <class T>
+	struct call_as_ptr
+	{
+		using type = T;
+		using const_type = const T;
+		static type* ptr(type& v) { return &v; }
+	};
+
+	template <class T>
+	struct call_as_ptr<T*>
+	{
+		typedef T       type;
+		typedef const T const_type;
+		static type* ptr(type* v) { return v; }
+	};
+
+	template <class T>
+	struct call_as_ptr<T&>
+	{
+		typedef T       type;
+		typedef const T const_type;
+		static type* ptr(type& v) { return &v; }
+	};
+
+	template <class T>
+	struct create_var
+	{
+		using type = T;
+		using const_type = const T;
+		static type create() { return type(); }
+	};
+
+	template <class T>
+	struct create_var<T*>
+	{
+		typedef T       type;
+		typedef const T const_type;
+		static type* create() { return new type(); }
+	};
+
+	//-------------------
+
 	template <typename T>
 	struct is_vector : public std::false_type
 	{
