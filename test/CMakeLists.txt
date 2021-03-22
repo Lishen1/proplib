@@ -1,11 +1,47 @@
-project(tests)
+option(BUILD_TESTING "Enabled testing" ON)
 
-add_executable(serdeser_test serdeser/main.cpp)
+find_package(GTest REQUIRED)
 
-target_link_libraries(serdeser_test propsdk gtest gtest_main gmock)
-add_test(NAME SerealzationDeserialization COMMAND serdeser_test)
+add_target(
+  TARGET
+    serdeser_test
+  SOURCES
+    serdeser_main.cpp
+  PRIVATE_LINKS
+    propsdk
+    GTest::GTest 
+    GTest::Main
+  BINARY_DIRECTORY
+    ${PROPERTYSDK_OUTPUT_DIR}
+  EXECUTABLE
+)
 
-enable_testing() 
+add_target(
+  TARGET
+    http_test
+  PREFIX
+    ${CMAKE_CURRENT_SOURCE_DIR}/http-client
+  SOURCES
+    rang.hpp
+    httplib.h
+    main.cpp
+  PRIVATE_LINKS
+    propsdk
+    GTest::GTest 
+    GTest::Main
+  BINARY_DIRECTORY
+    ${PROPERTYSDK_OUTPUT_DIR}
+  EXECUTABLE
+)
+#target_compile_definitions(http_test PRIVATE _WIN32_WINNT)
+
+if(WIN32)
+    target_link_libraries(http_test PRIVATE ws2_32)
+endif()
+
+add_test(SerealzationDeserialization serdeser_test)
+add_test(HttpSerealzationDeserialization http_test)
+
 
 
 

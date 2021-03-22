@@ -1,10 +1,10 @@
 #include "httplib.h"
-#include "serializable.h"
-#include "serialize.h"
+#include <serialize/serializable.h>
+#include <serialize/serialize.h>
 #include <cstdlib>
 
-#include <easylogging++.cc>
-#include <easylogging++.h>
+//#include <easylogging++.cc>
+//#include <easylogging++.h>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -13,12 +13,9 @@
 #include <typeindex>
 #include <typeinfo>
 #include <yaml-cpp/yaml.h>
-#include <conio.h>
+#include <cconio>
 #include <chrono>
 #include "rang.hpp"
-
-
-INITIALIZE_EASYLOGGINGPP
 
 std::string random_string(size_t length)
 {
@@ -180,7 +177,7 @@ private:
 
 int main()
 {
-  el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
+  //el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
 
   TestClass_2 ser_test;
 
@@ -189,13 +186,13 @@ int main()
 
   std::string name = "serialize";
 
-  el::Logger* businessLogger = el::Loggers::getLogger(name);
+  //el::Logger* businessLogger = el::Loggers::getLogger(name);
 
-  el::Configurations defaultConf;
-  defaultConf.setToDefault();
-  defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %level %msg");
+  //el::Configurations defaultConf;
+  //defaultConf.setToDefault();
+  //defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %level %msg");
 
-  el::Loggers::reconfigureLogger(name, defaultConf);
+  //el::Loggers::reconfigureLogger(name, defaultConf);
 
   std::string name2 = name;
 
