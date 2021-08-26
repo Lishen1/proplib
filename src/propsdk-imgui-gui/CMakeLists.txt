@@ -1,12 +1,32 @@
-project(propimgui)
+
 
 add_library( propimgui INTERFACE)
 target_include_directories( propimgui INTERFACE include )
-target_link_libraries( propimgui INTERFACE propsdk )
 
-#set_target_properties( propimgui
-#    PROPERTIES
-#    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-#    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-#    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
-#)
+add_git_dependency(
+  TARGET
+    propimgui
+  TARGET_ACCESS
+    PUBLIC
+  BINARY_DIRECTORY
+    ${PROPLIB_OUTPUT_DIR}
+  NAME              imgui
+  GITHUB_REPOSITORY ueberaccelerate/imgui
+  GIT_TAG           master
+  OPTIONS           "IMGUI_BUILD_EXAMPLES OFF"
+)
+
+add_git_dependency(
+  TARGET
+    propimgui
+  TARGET_ACCESS
+    PUBLIC
+  BINARY_DIRECTORY
+    ${PROPLIB_OUTPUT_DIR}
+  NAME              imgui-filebrowser
+  GITHUB_REPOSITORY AirGuanZ/imgui-filebrowser
+  GIT_TAG           master
+  OPTIONS           "IMGUI_BUILD_EXAMPLES OFF"
+)
+target_include_directories( imgui PUBLIC ${PROPLIB_BINARY_DIR}/_deps/imgui-filebrowser-src)
+target_link_libraries( propimgui INTERFACE ${PROPLIB_NAME} imgui)
