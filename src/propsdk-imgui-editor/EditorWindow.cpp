@@ -10,7 +10,7 @@
 #include <gui/gui.hpp>
 
 #include <imfilebrowser.h>
-
+#include <fstream>
 
 namespace editor {
 
@@ -84,7 +84,7 @@ int EditorWindow::setup_window()
     gui::SerializableGuiElementPtr serializableGui;
 
     ImGui::FileBrowser fileDialog;
-
+    std::string        selectedFile = "";
     // (optional) set browser properties
     fileDialog.SetTitle("title");
     fileDialog.SetTypeFilters({ ".yaml", ".yml" });
@@ -108,6 +108,8 @@ int EditorWindow::setup_window()
         ImGui::SetNextWindowPos(ImVec2(50, 20), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(550, 340), ImGuiCond_FirstUseEver);
         bool is_opened{true};
+        bool is_openfile{false};
+        bool is_saved{false};
         // Main body of the Demo window starts here.
         if(ImGui::Begin("Property ", &is_opened, ImGuiWindowFlags_MenuBar)) {
 
@@ -115,15 +117,40 @@ int EditorWindow::setup_window()
           {
             if (ImGui::BeginMenu("File"))
             {
+              std::filesystem::path selectedFile;
               if(ImGui::MenuItem("Open")) {
                 fileDialog.Open();
+                is_openfile = true;
               }
+
+              is_saved = ImGui::MenuItem("Save");
+              //{
+                //is_saved = true
+                //if (!selectedFile.empty())
+                //{
+                //  YAML::Emitter out;
+                //  out << root;
+                //  std::ofstream savefile(selectedFile.c_str());
+                //  savefile << out.c_str();
+                //  std::printf( "saved.\n");
+                //}
+
               ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
           }
 
           fileDialog.Display();
+          if (is_saved) {
+            YAML::Emitter out;
+            out << root;
+            std::ofstream savefile(selectedFile.c_str());
+            savefile << out.c_str();
+            std::printf( "saved.\n");
+          }
+
+          //std::printf("HasSelected %d.\n", fileDialog.HasSelected());
+          //std::printf("GetSelected %s.\n", fileDialog.GetSelected().c_str());
           if (serializableGui) {
             // open file dialog when user clicks this button
             serializableGui->makeGui();
@@ -131,7 +158,8 @@ int EditorWindow::setup_window()
 
           if (fileDialog.HasSelected())
           {
-            root = YAML::LoadFile(fileDialog.GetSelected().string());
+            selectedFile    = fileDialog.GetSelected().string();
+            root            = YAML::LoadFile(selectedFile);
             serializableGui = std::make_shared<gui::SerializableGuiElement>(root);
             fileDialog.ClearSelected();
           }
