@@ -14,15 +14,17 @@ namespace proplib
 {
   namespace serdes
   {
-    template <typename T>
-    void begin_map(T& node)
-    {
-    }
 
-    template <typename T>
-    void end_map(T& node)
-    {
-    }
+      template <typename T>
+      static void begin_map(T& node)
+      {
+      }
+
+      template <typename T>
+      static void end_map(T& node)
+      {
+      }
+    
   } // namespace serdes
 
   class IContainer
