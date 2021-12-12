@@ -14,13 +14,13 @@ namespace proplib
   namespace serdes
   {
     template <>
-    static void begin_map<YAML::Emitter>(YAML::Emitter& node)
+    void begin_map<YAML::Emitter>(YAML::Emitter& node)
     {
       node << YAML::BeginMap;
     }
 
     template <>
-    static void end_map<YAML::Emitter>(YAML::Emitter& node)
+    void end_map<YAML::Emitter>(YAML::Emitter& node)
     {
       node << YAML::EndMap;
     }
