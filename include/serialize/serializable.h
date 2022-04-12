@@ -3,6 +3,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "config.h"
 #include "tools.h"
@@ -15,16 +16,16 @@ namespace proplib
   namespace serdes
   {
 
-      template <typename T>
-      static void begin_map(T& node)
-      {
-      }
+    template <typename T>
+    static void begin_map(T& node)
+    {
+    }
 
-      template <typename T>
-      static void end_map(T& node)
-      {
-      }
-    
+    template <typename T>
+    static void end_map(T& node)
+    {
+    }
+
   } // namespace serdes
 
   class IContainer
@@ -48,26 +49,27 @@ namespace proplib
   class Serializable
   {
     using Function     = std::function<res_t(const std::string&, IContainer*)>;
+    using Functions    = std::vector<Function>;
     using VoidFunction = std::function<void()>;
 
   protected:
     struct Serializer_pair
     {
-      Function serializer;
-      Function deserializer;
+      Functions serializer;
+      Functions deserializer;
     };
 
     char add_serdes_lambda(std::string _key, Function serializer, Function deserializer)
     {
-      auto& lv_Pair        = _serializers[_key];
-      lv_Pair.serializer   = serializer;
-      lv_Pair.deserializer = deserializer;
+      auto& lv_Pair = _serializers[_key];
+      lv_Pair.serializer.push_back(serializer);
+      lv_Pair.deserializer.push_back(deserializer);
       return 0;
     }
 
     char serialize_subs(VoidFunction function)
     {
-      _subs_deser_func = function;
+      _subs_deser_func.push_back(function);
       return 0;
     }
 
@@ -93,15 +95,29 @@ namespace proplib
     res_t deserialize(T& cont) const
     {
 
-      if (_subs_deser_func)
-        _subs_deser_func();
+      if (!_subs_deser_func.empty())
+      {
+        for (auto& func : _subs_deser_func)
+        {
+          func();
+        }
+      }
 
       Container<T> container(cont);
       stat_t       stat;
 
       for (auto& lv_ser : _serializers)
       {
-        auto res = lv_ser.second.deserializer(lv_ser.first, &container);
+        res_t res = res_t::error;
+        for (auto& deser : lv_ser.second.deserializer)
+        {
+          res = deser(lv_ser.first, &container);
+          if (res == res_t::ok)
+            break;
+        }
+
+        // auto res = lv_ser.second.deserializer(lv_ser.first, &container);
+
         if (res == res_t::error)
           return res;
 
@@ -128,12 +144,26 @@ namespace proplib
     res_t leaf_serialize(T& cont, const bool& scheme = false) const
     {
       _scheme = scheme;
-      if (_subs_deser_func)
-        _subs_deser_func();
+      if (!_subs_deser_func.empty())
+      {
+        for (auto& func : _subs_deser_func)
+        {
+          func();
+        }
+      }
 
       Container<clear_type_v<T>> container(cont);
       for (auto& lv_ser : _serializers)
-        if (lv_ser.second.serializer(lv_ser.first, &container) != res_t::ok)
+      {
+        res_t val = res_t::error;
+        for (auto& ser : lv_ser.second.serializer)
+        {
+          val = ser(lv_ser.first, &container);
+          if (val == res_t::ok)
+            break;
+        }
+
+        if (val != res_t::ok)
         {
 #if ENABLE_SERDES_LOGGING
           CLOG(ERROR, _logger_id.c_str()) << "failed to serialize key "
@@ -143,16 +173,35 @@ namespace proplib
 #endif
           return res_t::error;
         }
+      }
       return res_t::ok;
     }
 
   protected:
     std::string                          _logger_id;
     std::map<std::string, Serializable*> subprops;
-    VoidFunction                         _subs_deser_func = nullptr;
-    mutable bool                         _scheme          = false;
+    std::vector<VoidFunction>            _subs_deser_func;
+    // VoidFunction                         _subs_deser_func = nullptr;
+    mutable bool _scheme = false;
 
   private:
     std::map<std::string, Serializer_pair> _serializers;
   };
+
+  namespace serdes
+  {
+    template <class T>
+    typename std::enable_if<(!std::is_same<Serializable, typename clear_type<T>::type>::value), typename clear_type<T>::type*>::type
+    new_derived_serializable()
+    {
+      return new typename clear_type<T>::type;
+    }
+
+    template <class T>
+    typename std::enable_if<(std::is_same<Serializable, typename clear_type<T>::type>::value), typename clear_type<T>::type*>::type
+    new_derived_serializable()
+    {
+      return nullptr;
+    }
+  } // namespace serdes
 } // namespace proplib

@@ -1,5 +1,6 @@
 
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${PROPLIB_NAME} INTERFACE)
 
@@ -25,7 +26,10 @@ target_include_directories(
 target_link_libraries(
   ${PROPLIB_NAME} 
   INTERFACE 
-    yaml-cpp )
+    yaml-cpp
+    nlohmann_json
+    nlohmann_json::nlohmann_json 
+    )
 
 if ( BUILD_PROPLIB_WITH_EDITOR )
   if ( BUILD_PROPLIB_WITH_QT_EDITOR )

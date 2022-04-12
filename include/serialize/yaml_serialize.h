@@ -26,20 +26,6 @@ namespace proplib
     }
 
     template <class T>
-    typename std::enable_if<(!std::is_same<Serializable, typename clear_type<T>::type>::value), typename clear_type<T>::type*>::type
-    new_derived_serializable()
-    {
-      return new typename clear_type<T>::type;
-    }
-
-    template <class T>
-    typename std::enable_if<(std::is_same<Serializable, typename clear_type<T>::type>::value), typename clear_type<T>::type*>::type
-    new_derived_serializable()
-    {
-      return nullptr;
-    }
-
-    template <class T>
     res_t serialize_field_other(const std::string& key, T* val, const std::string& logger_id, const std::string& doc_string, const bool& scheme,
                                 YAML::Emitter& node, ...)
     {
@@ -392,7 +378,8 @@ namespace proplib
           {
             auto s = (*val)[key];
             s->set_logger(logger_id);
-            res = s->deserialize(childs[key]);
+            YAML::Node&& nc = std::forward<YAML::Node>(childs[key]);
+            res = s->deserialize(nc);
           }
           else
           {
@@ -407,7 +394,8 @@ namespace proplib
             }
             cn->set_logger(logger_id);
             (*val)[key] = cn;
-            res         = cn->deserialize(childs[key]);
+            YAML::Node&& nc = std::forward<YAML::Node>(childs[key]);
+            res         = cn->deserialize(nc);
           }
 
           if (res == res_t::error)
