@@ -166,13 +166,13 @@ public:
     {
       if (!(*vector_test_class_1[i] == *other.vector_test_class_1[i]))
         return false;
-      auto c1 = *childs["test1"];
+      auto c1  = *childs["test1"];
       auto oc1 = *other.childs.at("test1");
 
       if (!(c1 == oc1))
         return false;
 
-      auto c2 = *childs["test2"];
+      auto c2  = *childs["test2"];
       auto oc2 = *other.childs.at("test2");
 
       if (!(c2 == oc2))
@@ -191,45 +191,71 @@ private:
 
 int main()
 {
-  TestClass_2 ser_test;
 
-  ser_test.set_random();
+  // ser/deser
+  {
+    TestClass_2 ser_test;
 
-  nlohmann::json out;
-  std::string    name  = "serialize";
-  std::string    name2 = name;
+    ser_test.set_random();
 
-  auto c1 = new TestClass_1;
-  auto c2 = new TestClass_1;
-  auto c3 = new TestClass_1;
+    nlohmann::json out;
+    std::string    name  = "serialize";
+    std::string    name2 = name;
 
-  c1->set_random();
-  c2->set_random();
-  c3->set_random();
+    auto c1 = new TestClass_1;
+    auto c2 = new TestClass_1;
+    auto c3 = new TestClass_1;
 
-  ser_test.add_subprop(c1, "c1");
-  ser_test.add_subprop(c2, "c2");
-  ser_test.add_subprop(c3, "c3");
+    c1->set_random();
+    c2->set_random();
+    c3->set_random();
 
-  ser_test.serialize(out, true);
+    ser_test.add_subprop(c1, "c1");
+    ser_test.add_subprop(c2, "c2");
+    ser_test.add_subprop(c3, "c3");
 
-  std::cout << "json\n" << out.dump() << std::endl;
-  std::ofstream file;
+    ser_test.serialize(out, true);
 
-  file.open("test.json");
-  file << out.dump() << std::endl;
-  file.close();
+    std::cout << "json\n" << out.dump() << std::endl;
+    std::ofstream file;
 
-  nlohmann::json saved_json;
-  std::ifstream  i("test.json");
-  i >> saved_json;
+    file.open("test.json");
+    file << out.dump() << std::endl;
+    file.close();
 
-  TestClass_2    deser_test;
-  proplib::res_t res = deser_test.deserialize(saved_json);
+    nlohmann::json saved_json;
+    std::ifstream  i("test.json");
+    i >> saved_json;
 
-  bool test_passed = ser_test == deser_test;
+    TestClass_2    deser_test;
+    proplib::res_t res = deser_test.deserialize(saved_json);
 
-  std::cout << "Test passed: " << test_passed << std::endl;
+    bool test_passed = ser_test == deser_test;
+
+    std::cout << "Test passed: " << test_passed << std::endl;
+  }
+
+  // copy
+  {
+    TestClass_1    c1;
+    TestClass_1    c3;
+    nlohmann::json orig_json;
+    c1.set_random();
+    c1.serialize(orig_json);
+
+    {
+      TestClass_1 c2;
+      auto        res = c2.deserialize(orig_json);
+      if (res == proplib::res_t::ok)
+      {
+        c3 = c2;
+      }
+
+    }
+    bool test_passed = c1 == c3;
+
+    std::cout << "Test passed: " << test_passed << std::endl;
+  }
 
   int d;
   d = 0;

@@ -138,6 +138,9 @@ namespace proplib
       return res_t::ok;
     }
 
+    // disabled copy internall stuff
+    Serializable& operator=(const Serializable& name) { return *this; }
+
     // should be a protected friend function but too complicated to implement
   public:
     template <class T>
