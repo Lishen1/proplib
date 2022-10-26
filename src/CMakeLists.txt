@@ -4,16 +4,18 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${PROPLIB_NAME} INTERFACE)
 
-target_sources(${PROPLIB_NAME}
-  INTERFACE
-    ${PROPLIB_SOURCE_DIR}/include/serialize/config.h
-    ${PROPLIB_SOURCE_DIR}/include/serialize/proplib.h
-    ${PROPLIB_SOURCE_DIR}/include/serialize/serializable.h
-    ${PROPLIB_SOURCE_DIR}/include/serialize/serialize.h
-    ${PROPLIB_SOURCE_DIR}/include/serialize/tools.h
-    ${PROPLIB_SOURCE_DIR}/include/serialize/types.h
-    ${PROPLIB_SOURCE_DIR}/include/serialize/yaml_serialize.h
-)
+if(PROPLIB_SUPER_DIR)
+  target_sources(${PROPLIB_NAME}
+    INTERFACE
+      ${PROPLIB_SOURCE_DIR}/include/serialize/config.h
+      ${PROPLIB_SOURCE_DIR}/include/serialize/proplib.h
+      ${PROPLIB_SOURCE_DIR}/include/serialize/serializable.h
+      ${PROPLIB_SOURCE_DIR}/include/serialize/serialize.h
+      ${PROPLIB_SOURCE_DIR}/include/serialize/tools.h
+      ${PROPLIB_SOURCE_DIR}/include/serialize/types.h
+      ${PROPLIB_SOURCE_DIR}/include/serialize/yaml_serialize.h
+  )
+endif()
 
 target_compile_features(
   ${PROPLIB_NAME} 

@@ -17,6 +17,11 @@ option(BUILD_PROPLIB_WITH_QT_EDITOR "Should the qt editor or imgui (default: img
 option(BUILD_PROPLIB_CLANG_TIDY_AUTO     "Enable auto clang-tidy" OFF)
 option(BUILD_PROPLIB_CLANG_TIDY_FIX      "Enable autofix clang-tidy" OFF)
 
+set(PROPLIB_SUPER_DIR 0)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(PROPLIB_SUPER_DIR 1)
+endif()
+
 if(MSVC)
   if(BUILD_SHARED_LIBS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
