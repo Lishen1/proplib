@@ -1,6 +1,9 @@
 #pragma once
 
-#include "json_serialize.h"
+#ifdef BUILD_JSON_SERDESER
+#	include "json_serialize.h"
+#endif
+
 #include "serializable.h"
 #include "tools.h"
 #include "yaml_serialize.h"
@@ -71,9 +74,17 @@ namespace proplib
                                                                                                                             \
       [this](const std::string& key, proplib::IContainer* cont) mutable { return proplib::try_deserialize_all<DESER>(key, cont, _logger_id, x); })
 
+
+#ifdef BUILD_JSON_SERDESER
+
 #define SERIALIZE(x, ...)                                    \
   SERIALIZE_IMPL(YAML::Emitter, YAML::Node, x, __VA_ARGS__); \
   SERIALIZE_IMPL(nlohmann::json, nlohmann::json, x, __VA_ARGS__)
+#else
+
+#define SERIALIZE(x, ...)                                    \
+  SERIALIZE_IMPL(YAML::Emitter, YAML::Node, x, __VA_ARGS__);
+#endif
 
 #define SERIALIZE_SUBS_IMPL(SER, DESER)                                                                                           \
   char UNNAMED = serialize_subs(                                                                                                  \
@@ -90,8 +101,13 @@ namespace proplib
         }                                                                                                                         \
       })
 
+
+#ifdef BUILD_JSON_SERDESER
 #define SERIALIZE_SUBS()                          \
   SERIALIZE_SUBS_IMPL(YAML::Emitter, YAML::Node); \
   SERIALIZE_SUBS_IMPL(nlohmann::json, nlohmann::json)
-
+#else
+#define SERIALIZE_SUBS()                          \
+  SERIALIZE_SUBS_IMPL(YAML::Emitter, YAML::Node); 
+#endif
 } // namespace proplib

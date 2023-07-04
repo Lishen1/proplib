@@ -1,6 +1,11 @@
 
 find_package(yaml-cpp CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
+
+if(BUILD_WITH_JSON_SERDESER)
+  find_package(nlohmann_json CONFIG REQUIRED)
+  set(JSON_LIBS nlohmann_json nlohmann_json::nlohmann_json)
+
+endif()
 
 add_library(${PROPLIB_NAME} INTERFACE)
 
@@ -16,7 +21,13 @@ if(PROPLIB_SUPER_DIR)
       ${PROPLIB_SOURCE_DIR}/include/serialize/yaml_serialize.h
   )
 endif()
-
+if(BUILD_WITH_JSON_SERDESER)
+	target_compile_definitions(
+	  ${PROPLIB_NAME}
+	  INTERFACE
+	    BUILD_JSON_SERDESER
+	)
+endif()
 target_compile_features(
   ${PROPLIB_NAME} 
   INTERFACE 
@@ -29,8 +40,7 @@ target_link_libraries(
   ${PROPLIB_NAME} 
   INTERFACE 
     yaml-cpp
-    nlohmann_json
-    nlohmann_json::nlohmann_json 
+    ${JSON_LIBS}
     )
 
 if ( BUILD_PROPLIB_WITH_EDITOR )

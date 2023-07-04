@@ -16,6 +16,7 @@ option(BUILD_PROPLIB_WITH_QT_EDITOR "Should the qt editor or imgui (default: img
 
 option(BUILD_PROPLIB_CLANG_TIDY_AUTO     "Enable auto clang-tidy" OFF)
 option(BUILD_PROPLIB_CLANG_TIDY_FIX      "Enable autofix clang-tidy" OFF)
+option(BUILD_WITH_JSON_SERDESER "ENABLE json ser/deser" OFF)
 
 set(PROPLIB_SUPER_DIR 0)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)

@@ -1,4 +1,6 @@
 
 add_subdirectory( prop-serialize-yaml )
-add_subdirectory( prop-serialize-json )
+if(BUILD_WITH_JSON_SERDESER)
+	add_subdirectory( prop-serialize-json )
+endif()
 
